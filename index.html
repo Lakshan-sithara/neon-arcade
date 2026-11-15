@@ -32,11 +32,12 @@
         }
     </script>
     <style>
-        body {
+        html, body {
             background-color: #080811;
             color: #f1f5f9;
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
+            max-width: 100vw;
             touch-action: manipulation;
         }
         .neon-border-cyan {
@@ -92,48 +93,48 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#070710] text-slate-100">
+<body class="min-h-screen flex flex-col bg-[#070710] text-slate-100 overflow-x-hidden">
 
     <!-- TOP NAVIGATION BAR -->
-    <header class="sticky top-0 z-40 backdrop-blur-md bg-[#0a0a18]/90 border-b border-cyan-500/30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-[#0a0a18]/90 border-b border-cyan-500/30 w-full">
+        <div class="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-1.5">
             <!-- Brand Logo -->
-            <div onclick="switchTab('lobby')" class="flex items-center gap-3 cursor-pointer group">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-neonPink to-neonCyan flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
-                    <i class="fa-solid fa-gamepad text-white text-xl"></i>
+            <div onclick="switchTab('lobby')" class="flex items-center gap-2 cursor-pointer group shrink-0">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-neonPink to-neonCyan flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
+                    <i class="fa-solid fa-gamepad text-white text-sm sm:text-xl"></i>
                 </div>
                 <div>
-                    <span class="font-arcade font-black text-xl sm:text-2xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-neonCyan via-white to-neonPink">
+                    <span class="font-arcade font-black text-sm sm:text-2xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-neonCyan via-white to-neonPink">
                         NEON<span class="text-neonPink">ARCADE</span>
                     </span>
-                    <span class="hidden sm:inline-block ml-2 text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
+                    <span class="hidden md:inline-block ml-2 text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
                         Free-to-Play
                     </span>
                 </div>
             </div>
 
             <!-- Navigation Links -->
-            <nav class="flex items-center gap-1 sm:gap-3">
-                <button onclick="switchTab('lobby')" id="nav-lobby" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
+            <nav class="flex items-center gap-1 sm:gap-2 shrink-0">
+                <button onclick="switchTab('lobby')" id="nav-lobby" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold transition flex items-center gap-1.5 bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
                     <i class="fa-solid fa-grip"></i>
-                    <span>Arcade Lobby</span>
+                    <span class="hidden xs:inline sm:inline">Lobby</span>
                 </button>
-                <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
+                <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
                     <i class="fa-solid fa-trophy text-amber-400"></i>
                     <span class="hidden md:inline">High Scores</span>
                 </button>
-                <button onclick="switchTab('admin')" id="nav-admin" class="hidden px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
+                <button onclick="switchTab('admin')" id="nav-admin" class="hidden px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
                     <i class="fa-solid fa-screwdriver-wrench text-neonPink"></i>
-                    <span>Admin Panel</span>
+                    <span class="hidden sm:inline">Admin</span>
                 </button>
-                <button onclick="switchTab('guide')" id="nav-guide" class="hidden px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
+                <button onclick="switchTab('guide')" id="nav-guide" class="hidden px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-question text-emerald-400"></i>
                     <span class="hidden lg:inline">How to Add Games</span>
                 </button>
             </nav>
 
             <!-- User Auth Status Area -->
-            <div id="user-nav-area" class="flex items-center gap-2">
+            <div id="user-nav-area" class="flex items-center gap-1.5 shrink-0">
                 <!-- Populated dynamically via JS -->
             </div>
         </div>
@@ -143,7 +144,7 @@
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
     <!-- MAIN CONTENT CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-2.5 sm:px-6 lg:px-8 py-3 sm:py-6 overflow-x-hidden">
 
         <!-- ==================== VIEW 1: ARCADE LOBBY ==================== -->
         <section id="view-lobby" class="space-y-8">
@@ -170,9 +171,9 @@
             </div>
 
             <!-- Search & Category Filter Bar -->
-            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-[#111122] p-4 rounded-xl border border-slate-800">
+            <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#111122] p-3 sm:p-4 rounded-xl border border-slate-800 w-full overflow-hidden">
                 <!-- Category Pills -->
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0" id="category-filters">
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 w-full" id="category-filters">
                     <button onclick="filterCategory('All')" data-cat="All" class="cat-btn px-4 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-neonCyan text-slate-950 transition whitespace-nowrap">
                         All Games
                     </button>
@@ -194,7 +195,7 @@
                 </div>
 
                 <!-- Search Input -->
-                <div class="relative min-w-[240px]">
+                <div class="relative w-full md:w-64 shrink-0">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                     <input type="text" id="game-search-input" oninput="renderGamesGrid()" placeholder="Search arcade games..." 
                         class="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-900 border border-slate-700 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-neonCyan">
@@ -208,154 +209,143 @@
         </section>
 
         <!-- ==================== VIEW 2: ACTIVE GAME ARENA ==================== -->
-        <section id="view-arena" class="hidden space-y-4">
-            <!-- Top Arena Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-3 bg-[#121225] px-4 py-3 rounded-xl border border-cyan-500/30">
-                <div class="flex items-center gap-3">
-                    <button onclick="closeGameArena()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-2 transition">
-                        <i class="fa-solid fa-arrow-left"></i> Back to Lobby
-                    </button>
-                    <div>
-                        <h2 id="arena-game-title" class="font-arcade font-bold text-base sm:text-xl text-white">Game Title</h2>
-                        <p id="arena-game-instructions" class="text-xs text-slate-400">Use Arrow Keys / WASD or On-Screen Touch Buttons</p>
-                    </div>
-                </div>
-
-                <!-- Live Score & High Score Display -->
-                <div class="flex items-center gap-4">
-                    <div class="bg-slate-900/90 px-3.5 py-1.5 rounded-lg border border-cyan-500/40 text-center">
-                        <span class="text-[10px] font-arcade uppercase text-slate-400 block">SCORE</span>
-                        <span id="arena-score" class="font-arcade font-bold text-lg text-neonCyan">0</span>
-                    </div>
-                    <div class="bg-slate-900/90 px-3.5 py-1.5 rounded-lg border border-pink-500/40 text-center">
-                        <span class="text-[10px] font-arcade uppercase text-slate-400 block">BEST</span>
-                        <span id="arena-best" class="font-arcade font-bold text-lg text-neonPink">0</span>
-                    </div>
-
-                    <!-- Live Game Speed Selector -->
-                    <div class="bg-slate-900/90 px-3 py-1.5 rounded-lg border border-emerald-500/40 flex flex-col items-center">
-                        <span class="text-[9px] font-arcade uppercase text-emerald-400 block mb-0.5">GAME SPEED</span>
-                        <div class="flex items-center gap-1" id="speed-control-group">
-                            <button onclick="setGameSpeed(0.35)" data-speed="0.35" class="speed-btn px-2 py-0.5 rounded text-[11px] font-arcade font-bold bg-emerald-500 text-slate-950 transition">0.35x</button>
-                            <button onclick="setGameSpeed(0.5)" data-speed="0.5" class="speed-btn px-2 py-0.5 rounded text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.5x</button>
-                            <button onclick="setGameSpeed(0.75)" data-speed="0.75" class="speed-btn px-2 py-0.5 rounded text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.75x</button>
-                            <button onclick="setGameSpeed(1)" data-speed="1" class="speed-btn px-2 py-0.5 rounded text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">1x</button>
+        <section id="view-arena" class="hidden space-y-2.5 sm:space-y-4">
+            <!-- Top Arena Bar (Ultra-Compact on Mobile so Game + Controls Fit in 1 Screen) -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#121225] px-2.5 py-2 sm:px-4 sm:py-3 rounded-xl border border-cyan-500/30 w-full">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <button onclick="closeGameArena()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition shrink-0">
+                            <i class="fa-solid fa-arrow-left"></i> <span class="hidden xs:inline">Lobby</span>
+                        </button>
+                        <div class="min-w-0">
+                            <h2 id="arena-game-title" class="font-arcade font-bold text-xs sm:text-lg text-white truncate">Game Title</h2>
+                            <p id="arena-game-instructions" class="hidden sm:block text-xs text-slate-400 truncate">Use Arrow Keys / WASD or On-Screen Touch Buttons</p>
                         </div>
                     </div>
 
-                    <button onclick="togglePauseGame()" id="arena-pause-btn" class="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs sm:text-sm font-arcade font-bold transition shadow-lg shadow-amber-500/20 flex items-center gap-1.5">
-                        <i class="fa-solid fa-pause" id="arena-pause-icon"></i>
-                        <span id="arena-pause-text">Pause</span>
-                    </button>
+                    <!-- Mobile Quick Pause & Restart -->
+                    <div class="flex sm:hidden items-center gap-1.5 shrink-0">
+                        <button onclick="togglePauseGame()" class="px-2.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-[11px] font-arcade font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-pause"></i>
+                        </button>
+                        <button onclick="restartCurrentGame()" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-neonPink to-purple-600 text-white text-[11px] font-arcade font-bold">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
 
-                    <button onclick="restartCurrentGame()" class="px-3 py-2 rounded-lg bg-gradient-to-r from-neonPink to-purple-600 hover:opacity-90 text-white text-xs sm:text-sm font-arcade font-bold transition shadow-lg shadow-pink-500/20">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> Restart
-                    </button>
+                <!-- Live Score, High Score & Speed Bar -->
+                <div class="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-3 flex-wrap">
+                    <div class="flex items-center gap-1.5">
+                        <div class="bg-slate-900/90 px-2.5 py-1 rounded-lg border border-cyan-500/40 text-center">
+                            <span class="text-[8px] sm:text-[10px] font-arcade uppercase text-slate-400 block">SCORE</span>
+                            <span id="arena-score" class="font-arcade font-bold text-xs sm:text-base text-neonCyan">0</span>
+                        </div>
+                        <div class="bg-slate-900/90 px-2.5 py-1 rounded-lg border border-pink-500/40 text-center">
+                            <span class="text-[8px] sm:text-[10px] font-arcade uppercase text-slate-400 block">BEST</span>
+                            <span id="arena-best" class="font-arcade font-bold text-xs sm:text-base text-neonPink">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Live Game Speed Selector -->
+                    <div class="bg-slate-900/90 px-2 py-1 rounded-lg border border-emerald-500/40 flex items-center gap-1.5">
+                        <span class="hidden md:inline text-[9px] font-arcade uppercase text-emerald-400">SPEED</span>
+                        <div class="flex items-center gap-1" id="speed-control-group">
+                            <button onclick="setGameSpeed(0.35)" data-speed="0.35" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-emerald-500 text-slate-950 transition">0.35x</button>
+                            <button onclick="setGameSpeed(0.5)" data-speed="0.5" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.5x</button>
+                            <button onclick="setGameSpeed(0.75)" data-speed="0.75" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.75x</button>
+                            <button onclick="setGameSpeed(1)" data-speed="1" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">1x</button>
+                        </div>
+                    </div>
+
+                    <!-- Desktop Pause & Restart -->
+                    <div class="hidden sm:flex items-center gap-2">
+                        <button onclick="togglePauseGame()" id="arena-pause-btn" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-arcade font-bold transition shadow-lg shadow-amber-500/20 flex items-center gap-1.5">
+                            <i class="fa-solid fa-pause" id="arena-pause-icon"></i>
+                            <span id="arena-pause-text">Pause</span>
+                        </button>
+                        <button onclick="restartCurrentGame()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-neonPink to-purple-600 hover:opacity-90 text-white text-xs font-arcade font-bold transition shadow-lg shadow-pink-500/20">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Restart
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Main Game Stage + Mobile Touch Controller -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
                 <!-- Game Viewport (Canvas or Custom Iframe/HTML) -->
-                <div class="lg:col-span-8 flex flex-col items-center justify-center bg-[#090914] rounded-2xl border-2 border-cyan-500/40 p-2 sm:p-4 shadow-2xl relative overflow-hidden min-h-[380px]">
+                <div class="lg:col-span-8 flex flex-col items-center justify-center bg-[#090914] rounded-2xl border-2 border-cyan-500/40 p-1.5 sm:p-4 shadow-2xl relative overflow-hidden">
                     
-                    <!-- Built-in Canvas Container -->
-                    <div id="canvas-wrapper" class="w-full max-w-[520px] aspect-[4/3] relative flex items-center justify-center bg-[#05050c] rounded-xl overflow-hidden border border-slate-800">
-                        <canvas id="arcade-canvas" width="520" height="390" class="w-full h-full block"></canvas>
+                    <!-- Built-in Canvas Container (Fits Mobile Viewport Height so Virtual Pad is Visible Without Scrolling) -->
+                    <div id="canvas-wrapper" class="w-full max-w-[520px] max-h-[42vh] sm:max-h-none aspect-[4/3] relative flex items-center justify-center bg-[#05050c] rounded-xl overflow-hidden border border-slate-800">
+                        <canvas id="arcade-canvas" width="520" height="390" class="w-full h-full object-contain block"></canvas>
                         
                         <!-- Pause Overlay inside Canvas -->
-                        <div id="canvas-pause-overlay" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
-                            <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-400 text-amber-400 flex items-center justify-center text-3xl mb-3 shadow-lg shadow-amber-500/20">
+                        <div id="canvas-pause-overlay" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center z-20">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-400 text-amber-400 flex items-center justify-center text-2xl sm:text-3xl mb-2 shadow-lg shadow-amber-500/20">
                                 <i class="fa-solid fa-pause"></i>
                             </div>
-                            <h3 class="font-arcade font-black text-2xl sm:text-3xl text-white mb-1">GAME PAUSED</h3>
-                            <p class="text-slate-300 text-xs sm:text-sm mb-5">Take a breather! Click Resume or press 'P' to continue playing.</p>
-                            <div class="flex flex-wrap items-center justify-center gap-3">
-                                <button onclick="togglePauseGame()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-neonCyan text-slate-950 font-arcade font-black text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-cyan-500/30">
-                                    <i class="fa-solid fa-play mr-1.5"></i> Resume Game
+                            <h3 class="font-arcade font-black text-xl sm:text-3xl text-white mb-1">GAME PAUSED</h3>
+                            <p class="text-slate-300 text-xs mb-4">Tap Resume or press 'P' to continue playing.</p>
+                            <div class="flex flex-wrap items-center justify-center gap-2">
+                                <button onclick="togglePauseGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-neonCyan text-slate-950 font-arcade font-black text-xs sm:text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-cyan-500/30">
+                                    <i class="fa-solid fa-play mr-1"></i> Resume
                                 </button>
-                                <button onclick="restartCurrentGame()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-arcade font-bold text-xs uppercase tracking-wider border border-slate-700 transition">
+                                <button onclick="restartCurrentGame()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-arcade font-bold text-xs uppercase tracking-wider border border-slate-700 transition">
                                     <i class="fa-solid fa-rotate-right mr-1"></i> Restart
                                 </button>
                             </div>
                         </div>
 
                         <!-- Game Over / Start Overlay inside Canvas -->
-                        <div id="canvas-overlay" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
-                            <div id="overlay-icon" class="text-5xl mb-3">🏆</div>
-                            <h3 id="overlay-title" class="font-arcade font-black text-2xl sm:text-3xl text-neonCyan mb-1">GAME OVER</h3>
-                            <p id="overlay-subtitle" class="text-slate-300 text-sm mb-5">Final Score: 0</p>
-                            <button onclick="restartCurrentGame()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-neonCyan to-blue-500 text-slate-950 font-arcade font-black text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-cyan-500/30">
+                        <div id="canvas-overlay" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center z-20">
+                            <div id="overlay-icon" class="text-4xl sm:text-5xl mb-2">🏆</div>
+                            <h3 id="overlay-title" class="font-arcade font-black text-xl sm:text-3xl text-neonCyan mb-1">GAME OVER</h3>
+                            <p id="overlay-subtitle" class="text-slate-300 text-xs sm:text-sm mb-4">Final Score: 0</p>
+                            <button onclick="restartCurrentGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-neonCyan to-blue-500 text-slate-950 font-arcade font-black text-xs sm:text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-cyan-500/30">
                                 <i class="fa-solid fa-play mr-1.5"></i> Play Again
                             </button>
                         </div>
                     </div>
 
                     <!-- Custom Admin Game Container (Iframe or Custom HTML) -->
-                    <div id="custom-game-wrapper" class="hidden w-full min-h-[450px] rounded-xl overflow-hidden border border-slate-800 bg-black">
+                    <div id="custom-game-wrapper" class="hidden w-full min-h-[340px] sm:min-h-[450px] rounded-xl overflow-hidden border border-slate-800 bg-black">
                         <!-- Dynamically populated for custom games -->
                     </div>
                 </div>
 
-                <!-- Universal Mobile & Desktop Touch Controller + Controls Guide -->
-                <div class="lg:col-span-4 bg-[#121225] rounded-2xl border border-slate-800 p-4 sm:p-5 space-y-5">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <span class="font-arcade font-bold text-sm text-neonCyan flex items-center gap-2">
-                            <i class="fa-solid fa-gamepad"></i> TOUCH & KEY CONTROLS
-                        </span>
-                        <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            All-Device Ready
-                        </span>
-                    </div>
-
-                    <!-- Fine-Grained Speed Slider Card -->
-                    <div class="bg-slate-900/80 rounded-xl p-3.5 border border-emerald-500/30 space-y-2">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="font-arcade font-bold text-emerald-400 flex items-center gap-1.5">
-                                <i class="fa-solid fa-gauge-high"></i> SPEED ADJUSTER
-                            </span>
-                            <span id="speed-slider-label" class="font-arcade font-bold text-white bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40">0.35x (Default)</span>
-                        </div>
-                        <input type="range" id="speed-range-slider" min="0.25" max="1.5" step="0.05" value="0.35"
-                            oninput="setGameSpeed(parseFloat(this.value))"
-                            class="w-full accent-emerald-400 cursor-pointer h-2 bg-slate-800 rounded-lg">
-                        <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-                            <span>🐢 0.35x Default</span>
-                            <span>⚖️ 0.75x Medium</span>
-                            <span>⚡ 1.5x Fast</span>
-                        </div>
-                    </div>
-
-                    <!-- Virtual Arcade Controller Pad (Works via Touch & Mouse Click) -->
-                    <div id="virtual-controller" class="bg-[#0b0b18] rounded-xl p-4 border border-slate-800/90 flex items-center justify-around gap-4 select-none">
+                <!-- Universal Mobile & Desktop Touch Controller + Controls Guide (Controller FIRST on mobile so zero scrolling needed!) -->
+                <div class="lg:col-span-4 bg-[#121225] rounded-2xl border border-slate-800 p-3 sm:p-5 space-y-3 sm:space-y-4 w-full">
+                    <!-- Virtual Arcade Controller Pad (Placed at the VERY TOP of the control card for instant mobile thumb reach) -->
+                    <div id="virtual-controller" class="bg-[#0b0b18] rounded-xl p-3 sm:p-4 border border-cyan-500/30 flex items-center justify-between sm:justify-around gap-3 select-none">
                         <!-- D-PAD -->
-                        <div class="grid grid-cols-3 gap-2 w-36 h-36">
+                        <div class="grid grid-cols-3 gap-1.5 w-32 h-32 sm:w-36 sm:h-36 shrink-0">
                             <div></div>
-                            <button id="btn-up" class="dpad-btn bg-slate-800/90 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
+                            <button id="btn-up" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
                                 <i class="fa-solid fa-caret-up"></i>
                             </button>
                             <div></div>
-                            <button id="btn-left" class="dpad-btn bg-slate-800/90 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
+                            <button id="btn-left" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
                                 <i class="fa-solid fa-caret-left"></i>
                             </button>
                             <div class="bg-slate-900 rounded-lg flex items-center justify-center border border-slate-800">
-                                <div class="w-3 h-3 rounded-full bg-cyan-500/40"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-cyan-500/40"></div>
                             </div>
-                            <button id="btn-right" class="dpad-btn bg-slate-800/90 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
+                            <button id="btn-right" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
                                 <i class="fa-solid fa-caret-right"></i>
                             </button>
                             <div></div>
-                            <button id="btn-down" class="dpad-btn bg-slate-800/90 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
+                            <button id="btn-down" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
                                 <i class="fa-solid fa-caret-down"></i>
                             </button>
                             <div></div>
                         </div>
 
-                        <!-- ACTION BUTTONS (A / B) -->
-                        <div class="flex flex-col items-center gap-3">
-                            <button id="btn-action" class="dpad-btn w-20 h-20 rounded-full bg-gradient-to-br from-neonPink to-rose-700 border-2 border-pink-400 text-white font-arcade font-black text-sm shadow-lg shadow-pink-500/30 flex flex-col items-center justify-center">
-                                <span class="text-base">ACTION</span>
-                                <span class="text-[9px] opacity-80">FIRE / JUMP</span>
+                        <!-- ACTION BUTTONS (INSTANT FIRE / JUMP) -->
+                        <div class="flex flex-col items-center gap-2.5">
+                            <button id="btn-action" class="dpad-btn w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-br from-neonPink to-rose-700 border-2 border-pink-400 text-white font-arcade font-black text-sm shadow-lg shadow-pink-500/30 flex flex-col items-center justify-center active:scale-95">
+                                <span class="text-base">FIRE</span>
+                                <span class="text-[9px] opacity-85">ACTION</span>
                             </button>
                             <button onclick="togglePauseGame()" id="mobile-pause-btn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-amber-400 font-arcade font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition">
                                 <i class="fa-solid fa-pause" id="mobile-pause-icon"></i>
@@ -365,9 +355,9 @@
                     </div>
 
                     <!-- On-Screen Touch QWERTY Keyboard for Typing Invaders (All-Device Mobile & Desktop Support) -->
-                    <div id="virtual-keyboard" class="hidden bg-[#0b0b18] rounded-xl p-3 border border-cyan-500/40 select-none space-y-3">
+                    <div id="virtual-keyboard" class="hidden bg-[#0b0b18] rounded-xl p-2.5 sm:p-3 border border-cyan-500/40 select-none space-y-2.5">
                         <!-- Word Category Selector Buttons -->
-                        <div class="bg-slate-900/90 rounded-lg p-2.5 border border-slate-800 space-y-2">
+                        <div class="bg-slate-900/90 rounded-lg p-2 border border-slate-800 space-y-1.5">
                             <div class="flex items-center justify-between text-[10px] font-arcade text-amber-400">
                                 <span><i class="fa-solid fa-layer-group mr-1"></i> WORD CATEGORY</span>
                                 <span id="typing-active-cat-label" class="text-neonCyan font-bold uppercase">TECH</span>
@@ -392,7 +382,7 @@
                         </div>
 
                         <div class="flex items-center justify-between text-[10px] font-arcade text-neonCyan px-1">
-                            <span><i class="fa-solid fa-keyboard mr-1"></i> TOUCH KEYBOARD (OR TYPE ON PC)</span>
+                            <span><i class="fa-solid fa-keyboard mr-1"></i> TOUCH KEYBOARD</span>
                             <button onclick="handleTypingChar('BACKSPACE')" class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30">
                                 <i class="fa-solid fa-delete-left mr-1"></i>UNLOCK WORD
                             </button>
@@ -402,17 +392,30 @@
                         </div>
                     </div>
 
+                    <!-- Fine-Grained Speed Slider Card -->
+                    <div class="bg-slate-900/80 rounded-xl p-3 border border-emerald-500/30 space-y-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="font-arcade font-bold text-emerald-400 flex items-center gap-1.5 text-[11px]">
+                                <i class="fa-solid fa-gauge-high"></i> SPEED ADJUSTER
+                            </span>
+                            <span id="speed-slider-label" class="font-arcade font-bold text-[11px] text-white bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40">0.35x (Default)</span>
+                        </div>
+                        <input type="range" id="speed-range-slider" min="0.25" max="1.5" step="0.05" value="0.35"
+                            oninput="setGameSpeed(parseFloat(this.value))"
+                            class="w-full accent-emerald-400 cursor-pointer h-2 bg-slate-800 rounded-lg">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-medium">
+                            <span>🐢 0.35x Default</span>
+                            <span>⚖️ 0.75x Medium</span>
+                            <span>⚡ 1.5x Fast</span>
+                        </div>
+                    </div>
+
                     <!-- How to Play Card -->
-                    <div class="bg-slate-900/70 rounded-xl p-3.5 border border-slate-800 space-y-2 text-xs text-slate-300">
+                    <div class="bg-slate-900/70 rounded-xl p-3 border border-slate-800 space-y-1.5 text-xs text-slate-300">
                         <div class="font-semibold text-white flex items-center gap-1.5">
                             <i class="fa-solid fa-circle-info text-neonCyan"></i> Game Instructions:
                         </div>
-                        <p id="arena-detailed-help" class="leading-relaxed text-slate-400"></p>
-                        <div class="pt-2 flex flex-wrap gap-2 text-[11px]">
-                            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300"><i class="fa-solid fa-keyboard mr-1 text-neonCyan"></i>Arrow Keys / WASD</span>
-                            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300"><i class="fa-solid fa-pause mr-1 text-amber-400"></i>Press P to Pause</span>
-                            <span class="px-2 py-1 rounded bg-slate-800 text-slate-300"><i class="fa-solid fa-mobile-screen mr-1 text-neonPink"></i>Touch D-Pad / Tap Canvas</span>
-                        </div>
+                        <p id="arena-detailed-help" class="leading-relaxed text-slate-400 text-[11px] sm:text-xs"></p>
                     </div>
                 </div>
             </div>
@@ -1154,10 +1157,10 @@ if (inputState.action) fireLaser();</pre>
 
             if (appState.currentUser) {
                 navArea.innerHTML = `
-                    <div class="flex items-center gap-2 bg-slate-900/90 border border-cyan-500/40 px-3 py-1.5 rounded-xl">
-                        <i class="fa-solid fa-user-astronaut text-neonCyan text-sm"></i>
-                        <span class="font-arcade font-bold text-xs text-white truncate max-w-[110px]">${appState.currentUser.name}</span>
-                        <button onclick="logoutUser()" title="Logout" class="ml-1 text-slate-400 hover:text-rose-400 text-xs transition">
+                    <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-900/90 border border-cyan-500/40 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl">
+                        <i class="fa-solid fa-user-astronaut text-neonCyan text-xs sm:text-sm"></i>
+                        <span class="font-arcade font-bold text-[11px] sm:text-xs text-white truncate max-w-[75px] sm:max-w-[110px]">${appState.currentUser.name}</span>
+                        <button onclick="logoutUser()" title="Logout" class="ml-0.5 text-slate-400 hover:text-rose-400 text-xs transition">
                             <i class="fa-solid fa-power-off"></i>
                         </button>
                     </div>
@@ -1172,8 +1175,8 @@ if (inputState.action) fireLaser();</pre>
                 }
             } else {
                 navArea.innerHTML = `
-                    <button onclick="openAuthModal('register')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-neonPink to-purple-600 hover:opacity-95 text-white font-arcade font-bold text-xs uppercase tracking-wider shadow-lg shadow-pink-500/20 transition">
-                        <i class="fa-solid fa-user-plus mr-1"></i> Register / Login
+                    <button onclick="openAuthModal('register')" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-neonPink to-purple-600 hover:opacity-95 text-white font-arcade font-bold text-[10px] sm:text-xs uppercase tracking-wider shadow-lg shadow-pink-500/20 transition whitespace-nowrap">
+                        <i class="fa-solid fa-user-plus mr-1"></i> <span class="hidden xs:inline">Register /</span> Login
                     </button>
                 `;
                 if (heroCta) {
@@ -1750,6 +1753,7 @@ if (inputState.action) fireLaser();</pre>
             action: false,
             justPressedAction: false,
             onDirectionTap: null,
+            onActionTap: null,
             onCanvasClick: null,
             onKeyPressChar: null
         };
@@ -1762,6 +1766,7 @@ if (inputState.action) fireLaser();</pre>
             inputState.action = false;
             inputState.justPressedAction = false;
             inputState.onDirectionTap = null;
+            inputState.onActionTap = null;
             inputState.onCanvasClick = null;
             inputState.onKeyPressChar = null;
         }
@@ -1905,7 +1910,10 @@ if (inputState.action) fireLaser();</pre>
                 if (inputState.onDirectionTap) inputState.onDirectionTap('right');
             }
             if (k === ' ' || k === 'enter') {
-                if (!inputState.action) inputState.justPressedAction = true;
+                if (!inputState.action) {
+                    inputState.justPressedAction = true;
+                    if (inputState.onActionTap) inputState.onActionTap();
+                }
                 inputState.action = true;
             }
         });
@@ -1920,7 +1928,7 @@ if (inputState.action) fireLaser();</pre>
             if (k === ' ' || k === 'enter') inputState.action = false;
         });
 
-        // Bind Virtual On-Screen Controller Buttons
+        // Bind Virtual On-Screen Controller Buttons (Using pointer events for zero-latency mobile response)
         function bindVirtualButton(btnId, dirKey) {
             const btn = document.getElementById(btnId);
             if (!btn) return;
@@ -1930,6 +1938,7 @@ if (inputState.action) fireLaser();</pre>
                 if (dirKey === 'action') {
                     inputState.action = true;
                     inputState.justPressedAction = true;
+                    if (inputState.onActionTap) inputState.onActionTap();
                 } else {
                     inputState[dirKey] = true;
                     if (inputState.onDirectionTap) inputState.onDirectionTap(dirKey);
@@ -1940,11 +1949,10 @@ if (inputState.action) fireLaser();</pre>
                 if (dirKey === 'action') inputState.action = false;
                 else inputState[dirKey] = false;
             };
-            btn.addEventListener('mousedown', press);
-            btn.addEventListener('mouseup', release);
-            btn.addEventListener('mouseleave', release);
-            btn.addEventListener('touchstart', press, { passive: false });
-            btn.addEventListener('touchend', release, { passive: false });
+            btn.addEventListener('pointerdown', press, { passive: false });
+            btn.addEventListener('pointerup', release, { passive: false });
+            btn.addEventListener('pointercancel', release, { passive: false });
+            btn.addEventListener('pointerleave', release, { passive: false });
         }
 
         bindVirtualButton('btn-up', 'up');
@@ -2020,6 +2028,7 @@ if (inputState.action) fireLaser();</pre>
                 document.getElementById(`view-${v}`).classList.add('hidden');
             });
             document.getElementById('view-arena').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
 
             const topRec = getTopRecordForGame(gameId);
             const bestScoreVal = Math.max(appState.highScores[gameId] || 0, topRec ? topRec.score : 0);
@@ -2686,6 +2695,33 @@ if (inputState.action) fireLaser();</pre>
                 return { dx: 1, dy: 0 };
             }
 
+            // Instant Fire Function for Tank Battle (fires immediately when FIRE button or Spacebar is pressed)
+            function firePlayerTankCannon(isInstantTap = false) {
+                if (isGameOver || isGamePaused) return;
+                const activePlayerBullets = bullets.filter(b => b.fromPlayer).length;
+                const maxAllowedBullets = player.rapidFireTimer > 0 ? 4 : 2;
+                const bulletSpeed = player.rapidFireTimer > 0 ? 7.2 : 5.4;
+
+                // If player explicitly tapped FIRE button, fire immediately as long as under bullet cap
+                if (!isInstantTap && player.cooldown > 0) return;
+                if (activePlayerBullets >= maxAllowedBullets) return;
+
+                const v = dirVector(player.dir);
+                bullets.push({
+                    x: player.x + v.dx * 14,
+                    y: player.y + v.dy * 14,
+                    vx: v.dx * bulletSpeed,
+                    vy: v.dy * bulletSpeed,
+                    fromPlayer: true
+                });
+                player.cooldown = player.rapidFireTimer > 0 ? 4 : 7;
+                inputState.justPressedAction = false;
+            }
+
+            // Trigger instant shot the exact millisecond user taps FIRE / ACTION or clicks canvas
+            inputState.onActionTap = () => firePlayerTankCannon(true);
+            inputState.onCanvasClick = () => firePlayerTankCannon(true);
+
             function drawTank(t, bodyColor, turretColor, hasShield = false) {
                 const half = t.size / 2;
                 ctx.save();
@@ -2765,23 +2801,12 @@ if (inputState.action) fireLaser();</pre>
                     player.y = ny;
                 }
 
-                // Player Fire (Rapid Fire » allows 2 faster shots)
-                if (player.cooldown > 0) player.cooldown -= spd;
-                const activePlayerBullets = bullets.filter(b => b.fromPlayer).length;
-                const maxAllowedBullets = player.rapidFireTimer > 0 ? 2 : 1;
-                const bulletSpeed = player.rapidFireTimer > 0 ? 6.8 : 4.8;
-
-                if ((inputState.action || inputState.justPressedAction) && player.cooldown <= 0 && activePlayerBullets < maxAllowedBullets) {
-                    const v = dirVector(player.dir);
-                    bullets.push({
-                        x: player.x + v.dx * 14,
-                        y: player.y + v.dy * 14,
-                        vx: v.dx * bulletSpeed,
-                        vy: v.dy * bulletSpeed,
-                        fromPlayer: true
-                    });
-                    player.cooldown = player.rapidFireTimer > 0 ? 9 : 18;
-                    inputState.justPressedAction = false;
+                // Player Fire (Instant on tap + auto-fire when holding FIRE button)
+                if (player.cooldown > 0) player.cooldown -= Math.max(0.65, spd);
+                if (inputState.justPressedAction) {
+                    firePlayerTankCannon(true);
+                } else if (inputState.action && player.cooldown <= 0) {
+                    firePlayerTankCannon(false);
                 }
 
                 // Check Power-Up Pickups
@@ -2878,6 +2903,7 @@ if (inputState.action) fireLaser();</pre>
                 // Update Bullets & Check Collisions
                 for (let i = bullets.length - 1; i >= 0; i--) {
                     const b = bullets[i];
+                    if (!b) continue;
                     b.x += b.vx * spd;
                     b.y += b.vy * spd;
 
@@ -2885,6 +2911,27 @@ if (inputState.action) fireLaser();</pre>
                     if (b.x < 6 || b.x > canvas.width - 6 || b.y < 6 || b.y > canvas.height - 6) {
                         bullets.splice(i, 1);
                         continue;
+                    }
+
+                    // Bullet-vs-Bullet Collision: Player bullets can shoot down incoming enemy bullets!
+                    if (b.fromPlayer) {
+                        let interceptedEnemyBullet = false;
+                        for (let m = bullets.length - 1; m >= 0; m--) {
+                            if (m === i) continue;
+                            const other = bullets[m];
+                            if (other && !other.fromPlayer && Math.hypot(b.x - other.x, b.y - other.y) < 10) {
+                                spawnExplosion((b.x + other.x) / 2, (b.y + other.y) / 2, '#00f3ff', 8);
+                                addScore(15);
+                                const highIdx = Math.max(i, m);
+                                const lowIdx = Math.min(i, m);
+                                bullets.splice(highIdx, 1);
+                                bullets.splice(lowIdx, 1);
+                                i = Math.min(i, bullets.length);
+                                interceptedEnemyBullet = true;
+                                break;
+                            }
+                        }
+                        if (interceptedEnemyBullet) continue;
                     }
 
                     // Check PC Tower Base Hit!
