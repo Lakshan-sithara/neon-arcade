@@ -76,6 +76,40 @@
             image-rendering: pixelated;
             touch-action: none;
         }
+        /* Universal PC & Mobile Fullscreen Mode for Game Stage */
+        #game-stage-container.is-fullscreen {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100dvh !important;
+            z-index: 9999 !important;
+            background-color: #05050d !important;
+            padding: 8px !important;
+            margin: 0 !important;
+            overflow-y: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+        }
+        @media (min-width: 1024px) {
+            #game-stage-container.is-fullscreen {
+                display: grid !important;
+                grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+                align-items: center !important;
+                padding: 20px !important;
+            }
+        }
+        #game-stage-container.is-fullscreen #canvas-wrapper {
+            max-height: 54dvh !important;
+            max-width: 100% !important;
+        }
+        @media (min-width: 1024px) {
+            #game-stage-container.is-fullscreen #canvas-wrapper {
+                max-height: 82dvh !important;
+                max-width: 960px !important;
+            }
+        }
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -225,6 +259,12 @@
 
                     <!-- Mobile Quick Pause & Restart -->
                     <div class="flex sm:hidden items-center gap-1.5 shrink-0">
+                        <button onclick="toggleGameFullscreen()" id="mobile-fs-btn" class="px-2 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-500/50 text-neonCyan text-[11px] font-arcade font-bold" title="Full Screen Mode">
+                            <i class="fa-solid fa-expand" id="mobile-fs-icon"></i>
+                        </button>
+                        <button onclick="toggleSoundMute()" id="mobile-sound-btn" class="px-2 py-1.5 rounded-lg bg-slate-800 border border-cyan-500/40 text-neonCyan text-[11px] font-arcade font-bold" title="Toggle Sound">
+                            <i class="fa-solid fa-volume-high" id="mobile-sound-icon"></i>
+                        </button>
                         <button onclick="togglePauseGame()" class="px-2.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-[11px] font-arcade font-bold flex items-center gap-1">
                             <i class="fa-solid fa-pause"></i>
                         </button>
@@ -236,6 +276,12 @@
 
                 <!-- Live Score, High Score & Speed Bar -->
                 <div class="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-3 flex-wrap">
+                    <!-- Xbox Controller Status Pill -->
+                    <div id="gamepad-status-badge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[10px] font-arcade">
+                        <i class="fa-brands fa-xbox text-emerald-400 text-xs animate-pulse"></i>
+                        <span id="gamepad-status-text">XBOX PAD READY</span>
+                    </div>
+
                     <div class="flex items-center gap-1.5">
                         <div class="bg-slate-900/90 px-2.5 py-1 rounded-lg border border-cyan-500/40 text-center">
                             <span class="text-[8px] sm:text-[10px] font-arcade uppercase text-slate-400 block">SCORE</span>
@@ -260,6 +306,14 @@
 
                     <!-- Desktop Pause & Restart -->
                     <div class="hidden sm:flex items-center gap-2">
+                        <button onclick="toggleGameFullscreen()" id="arena-fs-btn" class="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 text-neonCyan text-xs font-arcade font-bold transition flex items-center gap-1.5" title="Full Screen Mode (F)">
+                            <i class="fa-solid fa-expand" id="arena-fs-icon"></i>
+                            <span id="arena-fs-text" class="hidden md:inline">Full Screen</span>
+                        </button>
+                        <button onclick="toggleSoundMute()" id="arena-sound-btn" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-neonCyan text-xs font-arcade font-bold transition flex items-center gap-1.5" title="Mute / Unmute Arcade SFX">
+                            <i class="fa-solid fa-volume-high" id="arena-sound-icon"></i>
+                            <span id="arena-sound-text" class="hidden md:inline">SFX ON</span>
+                        </button>
                         <button onclick="togglePauseGame()" id="arena-pause-btn" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-arcade font-bold transition shadow-lg shadow-amber-500/20 flex items-center gap-1.5">
                             <i class="fa-solid fa-pause" id="arena-pause-icon"></i>
                             <span id="arena-pause-text">Pause</span>
@@ -272,9 +326,28 @@
             </div>
 
             <!-- Main Game Stage + Mobile Touch Controller -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
+            <div id="game-stage-container" class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start relative">
+                <!-- Floating Top HUD Bar shown while in Fullscreen Mode (PC & Mobile) -->
+                <div id="fs-floating-hud" class="hidden col-span-full w-full flex items-center justify-between bg-slate-950/90 border border-cyan-500/40 px-3 py-1.5 rounded-xl shrink-0">
+                    <div class="flex items-center gap-3">
+                        <span id="fs-hud-title" class="font-arcade font-bold text-xs sm:text-sm text-white truncate max-w-[140px] sm:max-w-xs">ARCADE</span>
+                        <span class="font-arcade text-xs text-neonCyan">SCORE: <strong id="fs-hud-score">0</strong></span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="togglePauseGame()" class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-arcade font-bold text-[10px]">
+                            <i class="fa-solid fa-pause"></i> Pause
+                        </button>
+                        <button onclick="restartCurrentGame()" class="px-2.5 py-1 rounded-lg bg-neonPink text-white font-arcade font-bold text-[10px]">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                        <button onclick="toggleGameFullscreen()" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-cyan-500/50 text-neonCyan font-arcade font-bold text-[10px] flex items-center gap-1">
+                            <i class="fa-solid fa-compress"></i> Exit Full
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Game Viewport (Canvas or Custom Iframe/HTML) -->
-                <div class="lg:col-span-8 flex flex-col items-center justify-center bg-[#090914] rounded-2xl border-2 border-cyan-500/40 p-1.5 sm:p-4 shadow-2xl relative overflow-hidden">
+                <div class="lg:col-span-8 flex flex-col items-center justify-center bg-[#090914] rounded-2xl border-2 border-cyan-500/40 p-1.5 sm:p-4 shadow-2xl relative overflow-hidden w-full">
                     
                     <!-- Built-in Canvas Container (Fits Mobile Viewport Height so Virtual Pad is Visible Without Scrolling) -->
                     <div id="canvas-wrapper" class="w-full max-w-[520px] max-h-[42vh] sm:max-h-none aspect-[4/3] relative flex items-center justify-center bg-[#05050c] rounded-xl overflow-hidden border border-slate-800">
@@ -316,41 +389,47 @@
 
                 <!-- Universal Mobile & Desktop Touch Controller + Controls Guide (Controller FIRST on mobile so zero scrolling needed!) -->
                 <div class="lg:col-span-4 bg-[#121225] rounded-2xl border border-slate-800 p-3 sm:p-5 space-y-3 sm:space-y-4 w-full">
-                    <!-- Virtual Arcade Controller Pad (Placed at the VERY TOP of the control card for instant mobile thumb reach) -->
-                    <div id="virtual-controller" class="bg-[#0b0b18] rounded-xl p-3 sm:p-4 border border-cyan-500/30 flex items-center justify-between sm:justify-around gap-3 select-none">
-                        <!-- D-PAD -->
-                        <div class="grid grid-cols-3 gap-1.5 w-32 h-32 sm:w-36 sm:h-36 shrink-0">
+                    <!-- Virtual Arcade Controller Pad (Enlarged for Big Fingers & Easy Thumb Reach) -->
+                    <div id="virtual-controller" class="bg-[#0b0b18] rounded-2xl p-3.5 sm:p-5 border border-cyan-500/40 flex items-center justify-between sm:justify-around gap-3 select-none">
+                        <!-- ENLARGED D-PAD (184px x 184px on Mobile, 196px on Tablet/PC) -->
+                        <div id="dpad-touch-zone" class="grid grid-cols-3 gap-2 w-[184px] h-[184px] sm:w-[196px] sm:h-[196px] shrink-0 touch-none">
                             <div></div>
-                            <button id="btn-up" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
-                                <i class="fa-solid fa-caret-up"></i>
+                            <button id="btn-up" data-dir="up" class="dpad-btn bg-slate-800/95 border-2 border-slate-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg active:bg-neonCyan/30">
+                                <i class="fa-solid fa-caret-up pointer-events-none"></i>
                             </button>
                             <div></div>
-                            <button id="btn-left" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
-                                <i class="fa-solid fa-caret-left"></i>
+                            <button id="btn-left" data-dir="left" class="dpad-btn bg-slate-800/95 border-2 border-slate-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg active:bg-neonCyan/30">
+                                <i class="fa-solid fa-caret-left pointer-events-none"></i>
                             </button>
-                            <div class="bg-slate-900 rounded-lg flex items-center justify-center border border-slate-800">
-                                <div class="w-2.5 h-2.5 rounded-full bg-cyan-500/40"></div>
+                            <div class="bg-slate-900/90 rounded-xl flex items-center justify-center border border-slate-800">
+                                <div class="w-4 h-4 rounded-full bg-cyan-500/40"></div>
                             </div>
-                            <button id="btn-right" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
-                                <i class="fa-solid fa-caret-right"></i>
+                            <button id="btn-right" data-dir="right" class="dpad-btn bg-slate-800/95 border-2 border-slate-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg active:bg-neonCyan/30">
+                                <i class="fa-solid fa-caret-right pointer-events-none"></i>
                             </button>
                             <div></div>
-                            <button id="btn-down" class="dpad-btn bg-slate-800/95 border border-slate-600 rounded-xl flex items-center justify-center text-white text-xl shadow-md active:bg-neonCyan/30">
-                                <i class="fa-solid fa-caret-down"></i>
+                            <button id="btn-down" data-dir="down" class="dpad-btn bg-slate-800/95 border-2 border-slate-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg active:bg-neonCyan/30">
+                                <i class="fa-solid fa-caret-down pointer-events-none"></i>
                             </button>
                             <div></div>
                         </div>
 
-                        <!-- ACTION BUTTONS (INSTANT FIRE / JUMP) -->
-                        <div class="flex flex-col items-center gap-2.5">
-                            <button id="btn-action" class="dpad-btn w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-gradient-to-br from-neonPink to-rose-700 border-2 border-pink-400 text-white font-arcade font-black text-sm shadow-lg shadow-pink-500/30 flex flex-col items-center justify-center active:scale-95">
-                                <span class="text-base">FIRE</span>
-                                <span class="text-[9px] opacity-85">ACTION</span>
+                        <!-- ENLARGED ACTION BUTTONS (INSTANT FIRE / JUMP) -->
+                        <div class="flex flex-col items-center gap-3">
+                            <button id="btn-action" class="dpad-btn w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-neonPink to-rose-700 border-4 border-pink-400 text-white font-arcade font-black shadow-xl shadow-pink-500/40 flex flex-col items-center justify-center active:scale-95">
+                                <span class="text-lg sm:text-xl tracking-wide pointer-events-none">FIRE</span>
+                                <span class="text-[10px] opacity-90 pointer-events-none">ACTION</span>
                             </button>
-                            <button onclick="togglePauseGame()" id="mobile-pause-btn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-amber-400 font-arcade font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition">
-                                <i class="fa-solid fa-pause" id="mobile-pause-icon"></i>
-                                <span id="mobile-pause-text">Pause (P)</span>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="togglePauseGame()" id="mobile-pause-btn" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-amber-400 font-arcade font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-pause" id="mobile-pause-icon"></i>
+                                    <span id="mobile-pause-text">Pause</span>
+                                </button>
+                                <button onclick="toggleGameFullscreen()" class="px-3 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-neonCyan font-arcade font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 transition">
+                                    <i class="fa-solid fa-expand"></i>
+                                    <span>Full</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -412,10 +491,18 @@
 
                     <!-- How to Play Card -->
                     <div class="bg-slate-900/70 rounded-xl p-3 border border-slate-800 space-y-1.5 text-xs text-slate-300">
-                        <div class="font-semibold text-white flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-info text-neonCyan"></i> Game Instructions:
+                        <div class="flex items-center justify-between">
+                            <div class="font-semibold text-white flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-info text-neonCyan"></i> Game Instructions:
+                            </div>
+                            <span class="text-[10px] font-arcade text-emerald-400 flex items-center gap-1">
+                                <i class="fa-brands fa-xbox"></i> Xbox + Rumble Ready
+                            </span>
                         </div>
                         <p id="arena-detailed-help" class="leading-relaxed text-slate-400 text-[11px] sm:text-xs"></p>
+                        <p class="text-[10px] text-slate-500 pt-1 border-t border-slate-800/80">
+                            🎮 <strong>Xbox Controller:</strong> Left Stick / D-Pad to move, <strong>A / X / RT</strong> to Fire/Action, <strong>Start</strong> to Pause, <strong>Y</strong> to Restart.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -929,8 +1016,338 @@ if (inputState.action) fireLaser();</pre>
             pendingGameId: null,
             activeGameId: null,
             gameSpeed: 0.35, // Default game speed set to 0.35x
-            typingCategory: 'tech' // Default word category for Typing Invaders ('tech', 'animals', 'planets', 'plants', 'all')
+            typingCategory: 'tech', // Default word category for Typing Invaders ('tech', 'animals', 'planets', 'plants', 'all')
+            soundMuted: false
         };
+
+        /********************************************************************
+         * 1B. RETRO ARCADE WEB AUDIO SYNTHESIZER & XBOX GAMEPAD VIBRATION
+         ********************************************************************/
+        let audioCtx = null;
+
+        function ensureAudioContext() {
+            if (appState.soundMuted) return null;
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
+            return audioCtx;
+        }
+
+        function toggleSoundMute() {
+            appState.soundMuted = !appState.soundMuted;
+            const dIcon = document.getElementById('arena-sound-icon');
+            const dText = document.getElementById('arena-sound-text');
+            const mIcon = document.getElementById('mobile-sound-icon');
+
+            if (appState.soundMuted) {
+                if (dIcon) dIcon.className = 'fa-solid fa-volume-xmark text-rose-400';
+                if (dText) dText.textContent = 'MUTED';
+                if (mIcon) mIcon.className = 'fa-solid fa-volume-xmark text-rose-400';
+            } else {
+                if (dIcon) dIcon.className = 'fa-solid fa-volume-high text-neonCyan';
+                if (dText) dText.textContent = 'SFX ON';
+                if (mIcon) mIcon.className = 'fa-solid fa-volume-high text-neonCyan';
+                playArcadeSound('powerup');
+            }
+        }
+
+        // Synthesizes crisp zero-latency arcade sound effects
+        function playArcadeSound(type = 'shoot') {
+            if (appState.soundMuted) return;
+            const ctxAudio = ensureAudioContext();
+            if (!ctxAudio) return;
+
+            try {
+                const now = ctxAudio.currentTime;
+                const osc = ctxAudio.createOscillator();
+                const gain = ctxAudio.createGain();
+                osc.connect(gain);
+                gain.connect(ctxAudio.destination);
+
+                if (type === 'shoot') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(620, now);
+                    osc.frequency.exponentialRampToValueAtTime(140, now + 0.09);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
+                } else if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(280, now);
+                    osc.frequency.exponentialRampToValueAtTime(75, now + 0.11);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+                    osc.start(now);
+                    osc.stop(now + 0.11);
+                } else if (type === 'explosion') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(32, now + 0.28);
+                    gain.gain.setValueAtTime(0.22, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                    osc.start(now);
+                    osc.stop(now + 0.28);
+                } else if (type === 'score' || type === 'coin') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.05); // E5
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+                    osc.start(now);
+                    osc.stop(now + 0.14);
+                } else if (type === 'powerup') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(330, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.22);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                    osc.start(now);
+                    osc.stop(now + 0.22);
+                } else if (type === 'bounce') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(340, now);
+                    osc.frequency.setValueAtTime(480, now + 0.03);
+                    gain.gain.setValueAtTime(0.09, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } else if (type === 'gameover') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(190, now + 0.18);
+                    osc.frequency.linearRampToValueAtTime(95, now + 0.42);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.44);
+                    osc.start(now);
+                    osc.stop(now + 0.44);
+                }
+            } catch (err) {
+                // Ignore Web Audio autoplay restrictions until first tap
+            }
+        }
+
+        // Triggers Dual-Motor Haptic Rumble on Xbox / Gamepad Controllers + Mobile Vibrate fallback
+        function triggerGamepadVibration(durationMs = 80, weakMagnitude = 0.5, strongMagnitude = 0.8) {
+            try {
+                const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+                for (let i = 0; i < gamepads.length; i++) {
+                    const gp = gamepads[i];
+                    if (!gp) continue;
+                    if (gp.vibrationActuator && typeof gp.vibrationActuator.playEffect === 'function') {
+                        gp.vibrationActuator.playEffect('dual-rumble', {
+                            startDelay: 0,
+                            duration: durationMs,
+                            weakMagnitude: Math.min(1, Math.max(0, weakMagnitude)),
+                            strongMagnitude: Math.min(1, Math.max(0, strongMagnitude))
+                        }).catch(() => {});
+                    } else if (gp.hapticActuators && gp.hapticActuators[0] && typeof gp.hapticActuators[0].pulse === 'function') {
+                        gp.hapticActuators[0].pulse(strongMagnitude, durationMs).catch(() => {});
+                    }
+                }
+                // Enhanced Mobile Phone Haptic Vibration Patterns
+                if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+                    if (durationMs >= 200) {
+                        // Heavy explosion / Game over double-pulse vibration on mobile phones
+                        navigator.vibrate([120, 40, 160]);
+                    } else if (durationMs >= 90) {
+                        // Medium hit / Power-up vibration on mobile phones
+                        navigator.vibrate([65, 25, 65]);
+                    } else {
+                        // Crisp tactile tap / shot vibration on mobile phones
+                        navigator.vibrate(Math.max(18, Math.min(75, durationMs)));
+                    }
+                }
+            } catch (e) {
+                // Ignore vibration errors on unsupported browsers
+            }
+        }
+
+        // Universal Fullscreen Mode for PC & Mobile Phones (Keeps Virtual Gamepad + Canvas Together)
+        let isStageFullscreen = false;
+
+        function isMobileDevice() {
+            return window.innerWidth <= 900 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+        }
+
+        function syncFullscreenUI(active) {
+            isStageFullscreen = active;
+            const stageEl = document.getElementById('game-stage-container');
+            const hudEl = document.getElementById('fs-floating-hud');
+            const dIcon = document.getElementById('arena-fs-icon');
+            const dText = document.getElementById('arena-fs-text');
+            const mIcon = document.getElementById('mobile-fs-icon');
+
+            if (stageEl) stageEl.classList.toggle('is-fullscreen', active);
+            if (hudEl) hudEl.classList.toggle('hidden', !active);
+
+            if (dIcon) dIcon.className = active ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+            if (dText) dText.textContent = active ? 'Exit Full' : 'Full Screen';
+            if (mIcon) mIcon.className = active ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+        }
+
+        async function toggleGameFullscreen(forceState = null) {
+            const stageEl = document.getElementById('game-stage-container');
+            if (!stageEl) return;
+
+            const nextState = forceState !== null ? forceState : !isStageFullscreen;
+            triggerGamepadVibration(25, 0.3, 0.4);
+
+            if (nextState) {
+                syncFullscreenUI(true);
+                try {
+                    if (stageEl.requestFullscreen) {
+                        await stageEl.requestFullscreen();
+                    } else if (stageEl.webkitRequestFullscreen) {
+                        await stageEl.webkitRequestFullscreen();
+                    }
+                } catch (err) {
+                    // Mobile browsers like iOS Safari use the CSS .is-fullscreen viewport lock seamlessly
+                }
+            } else {
+                syncFullscreenUI(false);
+                try {
+                    if (document.fullscreenElement && document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.webkitFullscreenElement && document.webkitExitFullscreen) {
+                        await document.webkitExitFullscreen();
+                    }
+                } catch (err) {}
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && isStageFullscreen) {
+                syncFullscreenUI(false);
+            }
+        });
+
+        // Xbox Controller Polling Engine (Supports Left Stick, D-Pad, A/B/X/Y, LB/RB/LT/RT, Start)
+        const gamepadPrevState = {
+            up: false,
+            down: false,
+            left: false,
+            right: false,
+            action: false,
+            pause: false,
+            restart: false
+        };
+
+        function updateGamepadBadge(connected, idText = 'XBOX CONTROLLER') {
+            const badge = document.getElementById('gamepad-status-badge');
+            const textEl = document.getElementById('gamepad-status-text');
+            if (!badge) return;
+            if (connected) {
+                badge.classList.remove('hidden');
+                badge.classList.add(' inline-flex');
+                if (textEl) textEl.textContent = idText.toUpperCase().includes('XBOX') ? 'XBOX PAD ACTIVE' : 'GAMEPAD ACTIVE';
+            } else {
+                badge.classList.add('hidden');
+                badge.classList.remove('inline-flex');
+            }
+        }
+
+        window.addEventListener('gamepadconnected', (e) => {
+            updateGamepadBadge(true, e.gamepad.id || 'XBOX CONTROLLER');
+            showToast(`🎮 Xbox/Gamepad Connected! Vibration & Sticks Enabled.`, 'success');
+            triggerGamepadVibration(160, 0.6, 0.9);
+            playArcadeSound('powerup');
+        });
+
+        window.addEventListener('gamepaddisconnected', () => {
+            updateGamepadBadge(false);
+            showToast('🎮 Controller Disconnected.', 'info');
+        });
+
+        function pollXboxGamepad() {
+            const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+            let activePad = null;
+            for (let i = 0; i < pads.length; i++) {
+                if (pads[i] && pads[i].connected) {
+                    activePad = pads[i];
+                    break;
+                }
+            }
+
+            if (activePad) {
+                updateGamepadBadge(true, activePad.id || 'XBOX');
+                const b = activePad.buttons;
+                const axes = activePad.axes || [0, 0];
+                const deadzone = 0.38;
+
+                const gpUp = (b[12] && b[12].pressed) || (axes[1] < -deadzone);
+                const gpDown = (b[13] && b[13].pressed) || (axes[1] > deadzone);
+                const gpLeft = (b[14] && b[14].pressed) || (axes[0] < -deadzone);
+                const gpRight = (b[15] && b[15].pressed) || (axes[0] > deadzone);
+
+                // Xbox A (0), X (2), RB (5), RT (7) all act as Fire / Action
+                const gpAction = Boolean(
+                    (b[0] && b[0].pressed) ||
+                    (b[2] && b[2].pressed) ||
+                    (b[5] && b[5].pressed) ||
+                    (b[7] && (b[7].pressed || b[7].value > 0.35))
+                );
+
+                // Start / Menu Button (9) toggles Pause
+                const gpPause = Boolean(b[9] && b[9].pressed);
+                // Y Button (3) restarts game
+                const gpRestart = Boolean(b[3] && b[3].pressed);
+
+                if (gpPause && !gamepadPrevState.pause) {
+                    togglePauseGame();
+                    triggerGamepadVibration(50, 0.4, 0.4);
+                }
+                if (gpRestart && !gamepadPrevState.restart && !document.getElementById('view-arena').classList.contains('hidden')) {
+                    restartCurrentGame();
+                    triggerGamepadVibration(90, 0.5, 0.7);
+                }
+
+                if (!isGamePaused && !isGameOver) {
+                    // Edge-triggered direction taps for Snake / 2048
+                    if (gpUp && !gamepadPrevState.up && inputState.onDirectionTap) inputState.onDirectionTap('up');
+                    if (gpDown && !gamepadPrevState.down && inputState.onDirectionTap) inputState.onDirectionTap('down');
+                    if (gpLeft && !gamepadPrevState.left && inputState.onDirectionTap) inputState.onDirectionTap('left');
+                    if (gpRight && !gamepadPrevState.right && inputState.onDirectionTap) inputState.onDirectionTap('right');
+
+                    // Continuous movement sync when gamepad direction changes
+                    if (gpUp !== gamepadPrevState.up) inputState.up = gpUp;
+                    if (gpDown !== gamepadPrevState.down) inputState.down = gpDown;
+                    if (gpLeft !== gamepadPrevState.left) inputState.left = gpLeft;
+                    if (gpRight !== gamepadPrevState.right) inputState.right = gpRight;
+
+                    // Keep held state active while stick/D-pad is held
+                    if (gpUp) inputState.up = true;
+                    if (gpDown) inputState.down = true;
+                    if (gpLeft) inputState.left = true;
+                    if (gpRight) inputState.right = true;
+
+                    // Instant Fire / Action on Xbox A / X / RT press
+                    if (gpAction && !gamepadPrevState.action) {
+                        inputState.justPressedAction = true;
+                        inputState.action = true;
+                        if (inputState.onActionTap) inputState.onActionTap();
+                    } else if (!gpAction && gamepadPrevState.action) {
+                        inputState.action = false;
+                    } else if (gpAction) {
+                        inputState.action = true;
+                    }
+                }
+
+                gamepadPrevState.up = gpUp;
+                gamepadPrevState.down = gpDown;
+                gamepadPrevState.left = gpLeft;
+                gamepadPrevState.right = gpRight;
+                gamepadPrevState.action = gpAction;
+                gamepadPrevState.pause = gpPause;
+                gamepadPrevState.restart = gpRestart;
+            }
+
+            requestAnimationFrame(pollXboxGamepad);
+        }
 
         // Load saved session state while Cloud DB initializes
         function loadSavedData() {
@@ -1773,6 +2190,7 @@ if (inputState.action) fireLaser();</pre>
 
         function handleTypingChar(char) {
             if (isGamePaused || isGameOver) return;
+            triggerGamepadVibration(20, 0.25, 0.35);
             if (inputState.onKeyPressChar) {
                 inputState.onKeyPressChar(char);
             }
@@ -1868,6 +2286,11 @@ if (inputState.action) fireLaser();</pre>
             if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') return;
 
             const k = e.key.toLowerCase();
+            if (k === 'f' && !document.getElementById('view-arena').classList.contains('hidden') && appState.activeGameId !== 'typing_invaders') {
+                e.preventDefault();
+                toggleGameFullscreen();
+                return;
+            }
             if (k === 'p' && !document.getElementById('view-arena').classList.contains('hidden') && appState.activeGameId !== 'typing_invaders') {
                 e.preventDefault();
                 togglePauseGame();
@@ -1935,6 +2358,8 @@ if (inputState.action) fireLaser();</pre>
             const press = (ev) => {
                 ev.preventDefault();
                 if (isGamePaused) return;
+                // Mobile phone tactile vibration feedback on every D-Pad / FIRE button tap
+                triggerGamepadVibration(dirKey === 'action' ? 35 : 20, 0.3, 0.45);
                 if (dirKey === 'action') {
                     inputState.action = true;
                     inputState.justPressedAction = true;
@@ -1961,6 +2386,31 @@ if (inputState.action) fireLaser();</pre>
         bindVirtualButton('btn-right', 'right');
         bindVirtualButton('btn-action', 'action');
 
+        // Allow thumb sliding across the D-Pad zone for effortless big-finger control
+        const dpadZone = document.getElementById('dpad-touch-zone');
+        if (dpadZone) {
+            let lastSlideDir = null;
+            const handleDpadSlide = (ev) => {
+                if (isGamePaused || !ev.touches || ev.touches.length === 0) return;
+                const touch = ev.touches[0];
+                const el = document.elementFromPoint(touch.clientX, touch.clientY);
+                const dirBtn = el ? el.closest('[data-dir]') : null;
+                const dir = dirBtn ? dirBtn.getAttribute('data-dir') : null;
+
+                if (dir && dir !== lastSlideDir) {
+                    ['up', 'down', 'left', 'right'].forEach(d => inputState[d] = (d === dir));
+                    if (inputState.onDirectionTap) inputState.onDirectionTap(dir);
+                    triggerGamepadVibration(18, 0.25, 0.35);
+                    lastSlideDir = dir;
+                }
+            };
+            dpadZone.addEventListener('touchmove', handleDpadSlide, { passive: true });
+            dpadZone.addEventListener('touchend', () => {
+                lastSlideDir = null;
+                ['up', 'down', 'left', 'right'].forEach(d => inputState[d] = false);
+            });
+        }
+
         // Canvas Click / Tap Listener
         canvas.addEventListener('pointerdown', (e) => {
             if (isGamePaused) return;
@@ -1986,6 +2436,15 @@ if (inputState.action) fireLaser();</pre>
         function addScore(points) {
             currentScore += points;
             document.getElementById('arena-score').textContent = currentScore;
+            const fsScore = document.getElementById('fs-hud-score');
+            if (fsScore) fsScore.textContent = currentScore;
+            if (points >= 25) {
+                playArcadeSound('score');
+                triggerGamepadVibration(45, 0.35, 0.5);
+            } else {
+                playArcadeSound('coin');
+                triggerGamepadVibration(22, 0.2, 0.3);
+            }
             const gid = appState.activeGameId;
             const currentTop = getTopRecordForGame(gid);
             const bestVal = Math.max(currentScore, appState.highScores[gid] || 0, currentTop ? currentTop.score : 0);
@@ -2001,6 +2460,8 @@ if (inputState.action) fireLaser();</pre>
             isGamePaused = false;
             updatePauseUI();
             stopActiveGameLoop();
+            playArcadeSound('gameover');
+            triggerGamepadVibration(320, 0.9, 1.0);
             if (appState.activeGameId && currentScore > 0) {
                 recordPlayerScore(appState.activeGameId, currentScore);
             }
@@ -2039,6 +2500,15 @@ if (inputState.action) fireLaser();</pre>
             document.getElementById('arena-score').textContent = '0';
             document.getElementById('arena-best').textContent = bestScoreVal;
             document.getElementById('canvas-overlay').classList.add('hidden');
+            const fsTitle = document.getElementById('fs-hud-title');
+            const fsScore = document.getElementById('fs-hud-score');
+            if (fsTitle) fsTitle.textContent = `${game.icon || '🎮'} ${game.title}`;
+            if (fsScore) fsScore.textContent = '0';
+
+            // Automatically enter Full Screen mode on Mobile Phones when launching any game
+            if (isMobileDevice()) {
+                toggleGameFullscreen(true);
+            }
 
             renderArenaLeaderboard(gameId);
 
@@ -2078,6 +2548,9 @@ if (inputState.action) fireLaser();</pre>
         }
 
         function closeGameArena() {
+            if (isStageFullscreen) {
+                toggleGameFullscreen(false);
+            }
             stopActiveGameLoop();
             switchTab('lobby');
         }
@@ -2256,6 +2729,8 @@ if (inputState.action) fireLaser();</pre>
                     if (letter === expectedChar) {
                         target.typedIndex++;
                         streak++;
+                        playArcadeSound('shoot');
+                        triggerGamepadVibration(25, 0.25, 0.3);
                         turret.angle = Math.atan2(target.y - turret.y, target.x - turret.x);
 
                         // Fire visual plasma laser beam to the invader
@@ -2274,6 +2749,8 @@ if (inputState.action) fireLaser();</pre>
                         // Check if entire word is completed
                         if (target.typedIndex >= target.word.length) {
                             createBurst(target.x, target.y, '#ff007f', 18);
+                            playArcadeSound('explosion');
+                            triggerGamepadVibration(110, 0.6, 0.85);
                             addScore(target.word.length * 10 + (target.isBoss ? 50 : 0));
                             enemies = enemies.filter(e => e.id !== target.id);
                             lockedEnemyId = null;
@@ -2293,6 +2770,8 @@ if (inputState.action) fireLaser();</pre>
                     } else {
                         // Typo resets streak
                         streak = 0;
+                        playArcadeSound('hit');
+                        triggerGamepadVibration(70, 0.5, 0.6);
                         lasers.push({
                             sx: turret.x,
                             sy: turret.y - 12,
@@ -2716,6 +3195,8 @@ if (inputState.action) fireLaser();</pre>
                 });
                 player.cooldown = player.rapidFireTimer > 0 ? 4 : 7;
                 inputState.justPressedAction = false;
+                playArcadeSound('shoot');
+                triggerGamepadVibration(35, 0.4, 0.55);
             }
 
             // Trigger instant shot the exact millisecond user taps FIRE / ACTION or clicks canvas
@@ -2819,6 +3300,8 @@ if (inputState.action) fireLaser();</pre>
                     }
                     if (Math.hypot(player.x - p.x, player.y - p.y) < half + 13) {
                         addScore(50);
+                        playArcadeSound('powerup');
+                        triggerGamepadVibration(120, 0.6, 0.85);
                         if (p.type === 'S') {
                             player.shieldTimer = 480;
                             showToast('🛡️ SHIELD: Enemy shots cannot hurt you!', 'info');
@@ -2921,6 +3404,8 @@ if (inputState.action) fireLaser();</pre>
                             const other = bullets[m];
                             if (other && !other.fromPlayer && Math.hypot(b.x - other.x, b.y - other.y) < 10) {
                                 spawnExplosion((b.x + other.x) / 2, (b.y + other.y) / 2, '#00f3ff', 8);
+                                playArcadeSound('hit');
+                                triggerGamepadVibration(45, 0.45, 0.6);
                                 addScore(15);
                                 const highIdx = Math.max(i, m);
                                 const lowIdx = Math.min(i, m);
@@ -2951,9 +3436,11 @@ if (inputState.action) fireLaser();</pre>
                             if (blk.type === 'brick') {
                                 blk.hp--;
                                 spawnExplosion(b.x, b.y, '#ea580c', 6);
+                                if (b.fromPlayer) playArcadeSound('hit');
                                 if (blk.hp <= 0) blocks.splice(k, 1);
                             } else {
                                 spawnExplosion(b.x, b.y, '#cbd5e1', 4);
+                                if (b.fromPlayer) playArcadeSound('bounce');
                             }
                             break;
                         }
@@ -2972,12 +3459,16 @@ if (inputState.action) fireLaser();</pre>
                                 bullets.splice(i, 1);
                                 if (en.hp <= 0) {
                                     spawnExplosion(en.x, en.y, en.isFlashing ? '#facc15' : '#ff007f', 14);
+                                    playArcadeSound('explosion');
+                                    triggerGamepadVibration(130, 0.75, 0.95);
                                     if (en.isFlashing) spawnPowerUp();
                                     enemies.splice(j, 1);
                                     addScore(en.isHeavy ? 200 : 100);
                                     if (enemies.length === 0 && enemiesRemainingToSpawn > 0) spawnEnemy();
                                 } else {
                                     spawnExplosion(b.x, b.y, '#facc15', 5);
+                                    playArcadeSound('hit');
+                                    triggerGamepadVibration(50, 0.4, 0.6);
                                 }
                                 break;
                             }
@@ -2988,9 +3479,12 @@ if (inputState.action) fireLaser();</pre>
                             bullets.splice(i, 1);
                             if (player.shieldTimer > 0) {
                                 spawnExplosion(b.x, b.y, '#00f3ff', 6);
+                                playArcadeSound('bounce');
                             } else {
                                 player.lives--;
                                 spawnExplosion(player.x, player.y, '#00ff66', 16);
+                                playArcadeSound('explosion');
+                                triggerGamepadVibration(220, 0.9, 1.0);
                                 if (player.lives <= 0) {
                                     triggerGameOver('TANK DESTROYED!', '💥');
                                     return;
@@ -3273,6 +3767,8 @@ if (inputState.action) fireLaser();</pre>
                     let hitOffset = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
                     ball.vx = hitOffset * 4.2;
                     ball.vy = -Math.abs(ball.vy);
+                    playArcadeSound('bounce');
+                    triggerGamepadVibration(30, 0.3, 0.4);
                 }
 
                 // Brick collision
@@ -3280,6 +3776,7 @@ if (inputState.action) fireLaser();</pre>
                     if (b.alive && ball.x > b.x && ball.x < b.x + b.w && ball.y - ball.r < b.y + b.h && ball.y + ball.r > b.y) {
                         b.alive = false;
                         ball.vy *= -1;
+                        playArcadeSound('hit');
                         addScore(15);
                     }
                 });
@@ -3353,6 +3850,8 @@ if (inputState.action) fireLaser();</pre>
                     bullets.push({ x: player.x + player.w / 2, y: player.y, vy: -6 });
                     shootCooldown = 14;
                     inputState.justPressedAction = false;
+                    playArcadeSound('shoot');
+                    triggerGamepadVibration(30, 0.3, 0.45);
                 }
 
                 bullets.forEach(b => b.y += b.vy * spd);
@@ -3379,6 +3878,8 @@ if (inputState.action) fireLaser();</pre>
                         if (a.alive && b.x > a.x && b.x < a.x + a.w && b.y > a.y && b.y < a.y + a.h) {
                             a.alive = false;
                             b.y = -100;
+                            playArcadeSound('explosion');
+                            triggerGamepadVibration(70, 0.5, 0.7);
                             addScore(20);
                         }
                     });
@@ -3455,7 +3956,15 @@ if (inputState.action) fireLaser();</pre>
                 // Player Paddle Hit
                 if (ball.x - ball.r <= p1.x + p1.w && ball.y >= p1.y && ball.y <= p1.y + p1.h && ball.vx < 0) {
                     ball.vx = Math.min(6.5, Math.abs(ball.vx) * 1.04);
+                    playArcadeSound('bounce');
+                    triggerGamepadVibration(35, 0.35, 0.5);
                     addScore(10);
+                }
+
+                // AI Paddle Hit
+                if (ball.x + ball.r >= ai.x && ball.y >= ai.y && ball.y <= ai.y + ai.h && ball.vx > 0) {
+                    ball.vx = -Math.abs(ball.vx);
+                    playArcadeSound('bounce');
                 }
 
                 // AI Paddle Hit
@@ -3518,6 +4027,8 @@ if (inputState.action) fireLaser();</pre>
                     drone.vy = -5.2;
                     inputState.justPressedAction = false;
                     inputState.up = false;
+                    playArcadeSound('bounce');
+                    triggerGamepadVibration(25, 0.25, 0.35);
                 }
 
                 drone.vy += 0.24 * spd;
@@ -3609,6 +4120,8 @@ if (inputState.action) fireLaser();</pre>
                     bullets.push({ x: ship.x, y: ship.y, vx: Math.cos(ship.angle) * 6, vy: Math.sin(ship.angle) * 6, life: 65 });
                     cooldown = 12;
                     inputState.justPressedAction = false;
+                    playArcadeSound('shoot');
+                    triggerGamepadVibration(30, 0.35, 0.5);
                 }
 
                 bullets.forEach(b => { b.x += b.vx * spd; b.y += b.vy * spd; b.life -= spd; });
@@ -3627,6 +4140,8 @@ if (inputState.action) fireLaser();</pre>
                     bullets.forEach(b => {
                         if (Math.hypot(b.x - r.x, b.y - r.y) < r.r) {
                             b.life = 0;
+                            playArcadeSound('explosion');
+                            triggerGamepadVibration(90, 0.6, 0.8);
                             addScore(25);
                             rocks.splice(ri, 1);
                             spawnRock();
@@ -3987,6 +4502,7 @@ if (inputState.action) fireLaser();</pre>
             renderUserNav();
             renderGamesGrid();
             initCloudflareD1Database();
+            requestAnimationFrame(pollXboxGamepad);
         });
 
         /********************************************************************
