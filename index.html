@@ -478,6 +478,9 @@
                         <span class="text-[11px] text-slate-400 block">Registered Users</span>
                         <span id="admin-stat-users" class="font-arcade font-bold text-xl text-neonPink">1</span>
                     </div>
+                    <button onclick="exportDatabaseAsSQL()" class="px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-arcade font-bold text-xs uppercase transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-code"></i> Export .SQL File
+                    </button>
                     <button onclick="logoutAdmin()" class="px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-arcade font-bold text-xs uppercase transition flex items-center gap-1.5">
                         <i class="fa-solid fa-right-from-bracket"></i> Exit Admin
                     </button>
@@ -575,11 +578,38 @@
 
                     <!-- Registered Users Directory -->
                     <div class="bg-[#121225] rounded-2xl p-6 border border-slate-800 space-y-4">
-                        <h3 class="font-arcade font-bold text-lg text-white flex items-center gap-2 border-b border-slate-800 pb-3">
-                            <i class="fa-solid fa-users text-neonPink"></i> REGISTERED PLAYERS
-                        </h3>
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="font-arcade font-bold text-lg text-white flex items-center gap-2">
+                                <i class="fa-solid fa-users text-neonPink"></i> REGISTERED PLAYERS DB
+                            </h3>
+                            <span id="db-sync-badge" class="text-[10px] font-arcade uppercase px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                <i class="fa-solid fa-database mr-1"></i> Connecting Cloudflare D1...
+                            </span>
+                        </div>
                         <div id="admin-users-list" class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
                             <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Admin Credentials Database Manager -->
+                    <div class="bg-[#121225] rounded-2xl p-6 border border-neonPink/40 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="font-arcade font-bold text-lg text-white flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield text-neonCyan"></i> ADMIN CREDENTIALS DATABASE
+                            </h3>
+                            <span class="text-[10px] font-arcade text-slate-400">Separate Admin DB Table</span>
+                        </div>
+                        <form onsubmit="handleAddAdminAccount(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                            <input type="text" id="new-admin-username" required placeholder="Admin Username / Email"
+                                class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-neonCyan">
+                            <input type="password" id="new-admin-password" required placeholder="Admin Password"
+                                class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-neonCyan">
+                            <button type="submit" class="px-3 py-2 rounded-lg bg-gradient-to-r from-neonCyan to-blue-500 text-slate-950 font-arcade font-bold text-xs uppercase">
+                                <i class="fa-solid fa-plus mr-1"></i> Save Admin to DB
+                            </button>
+                        </form>
+                        <div id="admin-accounts-db-list" class="space-y-2 max-h-[180px] overflow-y-auto pr-1">
+                            <!-- Populated from separate Admin DB collection -->
                         </div>
                     </div>
                 </div>
@@ -678,20 +708,10 @@ if (inputState.action) fireLaser();</pre>
                 </button>
             </div>
 
-            <!-- Admin Credentials Hint Box (Only visible in Admin Mode) -->
-            <div id="admin-cred-hint" class="hidden mb-4 p-3 rounded-xl bg-neonPink/10 border border-neonPink/40 text-xs text-slate-300 space-y-1">
-                <div class="font-arcade font-bold text-neonPink flex items-center justify-between">
-                    <span><i class="fa-solid fa-shield-halved mr-1"></i> ADMIN CREDENTIALS</span>
-                    <button type="button" onclick="fillAdminCredentials()" class="text-[10px] underline text-neonCyan hover:text-white">Auto-Fill</button>
-                </div>
-                <div>Email: <code class="text-white font-mono">admin@neonarcade.io</code></div>
-                <div>Password: <code class="text-white font-mono">admin1234</code></div>
-            </div>
-
             <!-- Auth Form -->
             <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
                 <div id="field-username">
-                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Player GamerTag / Name *</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Player GamerTag / Username *</label>
                     <div class="relative">
                         <i class="fa-solid fa-gamepad absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                         <input type="text" id="auth-name" placeholder="e.g. CyberNinja99"
@@ -700,10 +720,10 @@ if (inputState.action) fireLaser();</pre>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Email Address *</label>
+                    <label id="label-auth-identifier" class="block text-xs font-semibold uppercase text-slate-300 mb-1">Username or Email *</label>
                     <div class="relative">
-                        <i class="fa-solid fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                        <input type="email" id="auth-email" required placeholder="player@neonarcade.io"
+                        <i class="fa-solid fa-user-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="auth-email" required placeholder="Enter username or email"
                             class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-white focus:outline-none focus:border-neonCyan">
                     </div>
                 </div>
@@ -891,20 +911,19 @@ if (inputState.action) fireLaser();</pre>
             }
         ];
 
-        // Application State (In-Memory with automatic storage persistence fallback)
-        const ADMIN_CREDENTIALS = {
-            email: 'admin@neonarcade.io',
-            pass: 'admin1234',
-            name: 'ArcadeAdmin'
-        };
+        // Default initial seed for the Separate Admin Credentials Database
+        const INITIAL_ADMIN_DB_SEED = [
+            { id: 'admin_root_1', username: 'admin', email: 'admin@neonarcade.io', pass: 'admin1234', role: 'SuperAdmin' }
+        ];
 
         let appState = {
             currentUser: null,
             isAdminAuthenticated: false,
-            users: [],
+            users: [], // Separate Player Accounts DB Collection (`player_accounts`)
+            admins: [...INITIAL_ADMIN_DB_SEED], // Separate Admin Accounts DB Collection (`admin_accounts`)
             games: [...DEFAULT_GAMES],
             highScores: {}, // { gameId: score }
-            scoreHistory: {}, // { gameId: [{ user, score, date }] } - Populated only from real player games
+            scoreHistory: {}, // Separate Leaderboard DB Collection (`score_records`)
             selectedCategory: 'All',
             authMode: 'register',
             pendingGameId: null,
@@ -913,36 +932,15 @@ if (inputState.action) fireLaser();</pre>
             typingCategory: 'tech' // Default word category for Typing Invaders ('tech', 'animals', 'planets', 'plants', 'all')
         };
 
-        // Load saved data safely if storage is available
+        // Load saved session state while Cloud DB initializes
         function loadSavedData() {
             try {
-                const savedGames = window.sessionStorage.getItem('neon_games_v1');
-                const savedUsers = window.sessionStorage.getItem('neon_users_v2');
                 const savedCurrentUser = window.sessionStorage.getItem('neon_current_user_v1');
                 const savedAdminAuth = window.sessionStorage.getItem('neon_admin_auth_v1');
-                const savedScores = window.sessionStorage.getItem('neon_real_scores_v2');
-                const savedHistory = window.sessionStorage.getItem('neon_real_score_history_v2');
                 const savedSpeed = window.sessionStorage.getItem('neon_game_speed_v2');
 
-                if (savedGames) {
-                    appState.games = JSON.parse(savedGames);
-                    // Ensure any newly added or updated built-in games (like Tank Battle) are synced into existing saved catalogs
-                    DEFAULT_GAMES.forEach(defGame => {
-                        const existingIdx = appState.games.findIndex(g => g.id === defGame.id);
-                        if (existingIdx === -1) {
-                            appState.games.unshift(defGame);
-                        } else if (defGame.id === 'cyber_tank' || defGame.id === 'typing_invaders') {
-                            appState.games[existingIdx] = { ...defGame };
-                        }
-                    });
-                }
-                if (savedUsers) appState.users = JSON.parse(savedUsers);
                 if (savedCurrentUser) appState.currentUser = JSON.parse(savedCurrentUser);
                 if (savedAdminAuth === 'true') appState.isAdminAuthenticated = true;
-                if (savedScores) appState.highScores = JSON.parse(savedScores);
-                if (savedHistory) {
-                    appState.scoreHistory = JSON.parse(savedHistory);
-                }
                 if (savedSpeed) appState.gameSpeed = parseFloat(savedSpeed) || 0.35;
             } catch (e) {
                 // Fallback to in-memory state silently
@@ -951,16 +949,12 @@ if (inputState.action) fireLaser();</pre>
 
         function saveData() {
             try {
-                window.sessionStorage.setItem('neon_games_v1', JSON.stringify(appState.games));
-                window.sessionStorage.setItem('neon_users_v2', JSON.stringify(appState.users));
                 if (appState.currentUser) {
                     window.sessionStorage.setItem('neon_current_user_v1', JSON.stringify(appState.currentUser));
                 } else {
                     window.sessionStorage.removeItem('neon_current_user_v1');
                 }
                 window.sessionStorage.setItem('neon_admin_auth_v1', appState.isAdminAuthenticated ? 'true' : 'false');
-                window.sessionStorage.setItem('neon_real_scores_v2', JSON.stringify(appState.highScores));
-                window.sessionStorage.setItem('neon_real_score_history_v2', JSON.stringify(appState.scoreHistory));
                 window.sessionStorage.setItem('neon_game_speed_v2', String(appState.gameSpeed));
             } catch (e) {
                 // Ignore storage restriction errors in sandboxed iframes
@@ -1011,6 +1005,14 @@ if (inputState.action) fireLaser();</pre>
             }
 
             saveData();
+            if (window.cloudDB && window.cloudDB.saveGameScoreRecord) {
+                window.cloudDB.saveGameScoreRecord(gameId, list, {
+                    gameId,
+                    user: playerName,
+                    score,
+                    date: today
+                });
+            }
             renderArenaLeaderboard(gameId);
         }
 
@@ -1286,94 +1288,137 @@ if (inputState.action) fireLaser();</pre>
             appState.authMode = mode;
             const titleEl = document.getElementById('auth-modal-title');
             const nameField = document.getElementById('field-username');
+            const identifierLabel = document.getElementById('label-auth-identifier');
+            const emailInput = document.getElementById('auth-email');
             const submitBtn = document.getElementById('auth-submit-btn');
             const regTab = document.getElementById('tab-register-btn');
             const loginTab = document.getElementById('tab-login-btn');
-            const adminHint = document.getElementById('admin-cred-hint');
             const tabsBar = document.getElementById('auth-tabs-bar');
             const guestBtn = document.getElementById('guest-pass-btn');
+            const adminToggleBtn = document.getElementById('admin-mode-toggle-btn');
 
             if (mode === 'register') {
                 titleEl.textContent = 'PLAYER REGISTRATION';
                 nameField.classList.remove('hidden');
-                adminHint.classList.add('hidden');
+                if (identifierLabel) identifierLabel.textContent = 'Email Address *';
+                if (emailInput) emailInput.placeholder = 'player@neonarcade.io';
                 tabsBar.classList.remove('hidden');
                 if (guestBtn) guestBtn.classList.remove('hidden');
+                if (adminToggleBtn) adminToggleBtn.classList.remove('hidden');
                 submitBtn.textContent = 'Create Free Account & Play';
                 regTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase bg-neonCyan text-slate-950 transition';
                 loginTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase text-slate-400 hover:text-white transition';
             } else if (mode === 'login') {
                 titleEl.textContent = 'PLAYER LOGIN';
                 nameField.classList.add('hidden');
-                adminHint.classList.add('hidden');
+                if (identifierLabel) identifierLabel.textContent = 'Username or Email *';
+                if (emailInput) emailInput.placeholder = 'Enter your username or email';
                 tabsBar.classList.remove('hidden');
                 if (guestBtn) guestBtn.classList.remove('hidden');
+                if (adminToggleBtn) adminToggleBtn.classList.remove('hidden');
                 submitBtn.textContent = 'Login & Enter Arcade';
                 loginTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase bg-neonCyan text-slate-950 transition';
                 regTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase text-slate-400 hover:text-white transition';
             } else if (mode === 'admin') {
                 titleEl.textContent = 'ADMIN CONSOLE LOGIN';
                 nameField.classList.add('hidden');
-                adminHint.classList.remove('hidden');
+                if (identifierLabel) identifierLabel.textContent = 'Admin Username or Email *';
+                if (emailInput) emailInput.placeholder = 'Enter admin username or email';
                 tabsBar.classList.add('hidden');
                 if (guestBtn) guestBtn.classList.add('hidden');
+                if (adminToggleBtn) adminToggleBtn.classList.add('hidden');
                 submitBtn.textContent = 'Unlock Admin Dashboard';
             }
         }
 
-        function fillAdminCredentials() {
-            document.getElementById('auth-email').value = ADMIN_CREDENTIALS.email;
-            document.getElementById('auth-password').value = ADMIN_CREDENTIALS.pass;
-        }
-
-        function handleAuthSubmit(e) {
+        async function handleAuthSubmit(e) {
             e.preventDefault();
             const nameInput = (document.getElementById('auth-name').value || '').trim();
-            const emailInput = (document.getElementById('auth-email').value || '').trim().toLowerCase();
+            const identifierInput = (document.getElementById('auth-email').value || '').trim().toLowerCase();
             const passInput = (document.getElementById('auth-password').value || '').trim();
 
             if (appState.authMode === 'admin') {
-                if (emailInput === ADMIN_CREDENTIALS.email.toLowerCase() && passInput === ADMIN_CREDENTIALS.pass) {
+                const matchedAdmin = appState.admins.find(a =>
+                    ((a.username || '').toLowerCase() === identifierInput || (a.email || '').toLowerCase() === identifierInput) &&
+                    a.pass === passInput
+                );
+
+                if (matchedAdmin) {
                     appState.isAdminAuthenticated = true;
                     if (!appState.currentUser) {
-                        appState.currentUser = { name: ADMIN_CREDENTIALS.name, email: ADMIN_CREDENTIALS.email };
+                        appState.currentUser = { name: matchedAdmin.username || 'ArcadeAdmin', email: matchedAdmin.email || identifierInput };
                     }
                     saveData();
                     renderUserNav();
                     closeAuthModal();
-                    showToast('Admin authenticated! Welcome to the Arcade Management Console.', 'success');
+                    showToast('Admin authenticated from database! Welcome to the Console.', 'success');
                     switchTab('admin');
                 } else {
-                    showToast('Invalid Admin credentials! Use admin@neonarcade.io / admin1234', 'error');
+                    showToast('Invalid Admin username or password!', 'error');
                 }
                 return;
             }
 
             if (appState.authMode === 'register') {
-                const gamerTag = nameInput || emailInput.split('@')[0] || 'CyberPlayer';
-                const newUser = {
-                    name: gamerTag,
-                    email: emailInput,
-                    pass: passInput,
-                    joined: new Date().toISOString().slice(0, 10)
-                };
-                const existing = appState.users.find(u => (u.email || '').toLowerCase() === emailInput);
-                if (!existing) {
-                    appState.users.push(newUser);
+                const gamerTag = nameInput || identifierInput.split('@')[0] || 'CyberPlayer';
+                const existing = appState.users.find(u =>
+                    (u.email || '').toLowerCase() === identifierInput ||
+                    (u.name || '').toLowerCase() === gamerTag.toLowerCase()
+                );
+
+                if (existing) {
+                    showToast('That username or email is already registered in the database. Please log in!', 'error');
+                    switchAuthMode('login');
+                    return;
                 }
-                appState.currentUser = { name: gamerTag, email: emailInput };
+
+                const newUser = {
+                    id: 'usr_' + Date.now(),
+                    name: gamerTag,
+                    email: identifierInput,
+                    pass: passInput,
+                    joined: getFormattedDate()
+                };
+                appState.users.push(newUser);
+                if (window.cloudDB && window.cloudDB.savePlayerAccount) {
+                    await window.cloudDB.savePlayerAccount(newUser);
+                }
+
+                appState.currentUser = { name: gamerTag, email: identifierInput };
                 saveData();
                 renderUserNav();
                 renderGamesGrid();
                 const pending = appState.pendingGameId;
                 closeAuthModal();
-                showToast(`Welcome to NeonArcade, ${gamerTag}! All games unlocked.`, 'success');
+                showToast(`Account saved to database! Welcome, ${gamerTag}!`, 'success');
                 if (pending) launchGame(pending);
             } else {
-                // Login mode - also check if admin credentials were typed in regular login
-                if (emailInput === ADMIN_CREDENTIALS.email.toLowerCase() && passInput === ADMIN_CREDENTIALS.pass) {
+                // Player Login Mode - Check Player Accounts Database
+                const foundPlayer = appState.users.find(u =>
+                    ((u.email || '').toLowerCase() === identifierInput || (u.name || '').toLowerCase() === identifierInput) &&
+                    u.pass === passInput
+                );
+
+                if (foundPlayer) {
+                    appState.currentUser = { name: foundPlayer.name, email: foundPlayer.email };
+                    saveData();
+                    renderUserNav();
+                    renderGamesGrid();
+                    const pending = appState.pendingGameId;
+                    closeAuthModal();
+                    showToast(`Welcome back, ${foundPlayer.name}!`, 'success');
+                    if (pending) launchGame(pending);
+                    return;
+                }
+
+                // Also check if an Admin logged in via the standard login screen
+                const foundAdmin = appState.admins.find(a =>
+                    ((a.username || '').toLowerCase() === identifierInput || (a.email || '').toLowerCase() === identifierInput) &&
+                    a.pass === passInput
+                );
+                if (foundAdmin) {
                     appState.isAdminAuthenticated = true;
-                    appState.currentUser = { name: ADMIN_CREDENTIALS.name, email: ADMIN_CREDENTIALS.email };
+                    appState.currentUser = { name: foundAdmin.username || 'ArcadeAdmin', email: foundAdmin.email || identifierInput };
                     saveData();
                     renderUserNav();
                     closeAuthModal();
@@ -1381,24 +1426,20 @@ if (inputState.action) fireLaser();</pre>
                     switchTab('admin');
                     return;
                 }
-                const found = appState.users.find(u => (u.email || '').toLowerCase() === emailInput);
-                const gamerTag = found ? found.name : (emailInput.split('@')[0] || 'CyberPlayer');
-                appState.currentUser = { name: gamerTag, email: emailInput };
-                saveData();
-                renderUserNav();
-                renderGamesGrid();
-                const pending = appState.pendingGameId;
-                closeAuthModal();
-                showToast(`Welcome back, ${gamerTag}!`, 'success');
-                if (pending) launchGame(pending);
+
+                showToast('Incorrect username/email or password! Please register first if you are new.', 'error');
             }
         }
 
-        function quickInstantRegister() {
+        async function quickInstantRegister() {
             const randomId = Math.floor(100 + Math.random() * 900);
             const gamerTag = `NeonPlayer_${randomId}`;
             const email = `guest${randomId}@neonarcade.io`;
-            appState.users.push({ name: gamerTag, email, pass: 'guest', joined: new Date().toISOString().slice(0, 10) });
+            const guestUser = { id: 'usr_' + Date.now(), name: gamerTag, email, pass: 'guest' + randomId, joined: getFormattedDate() };
+            appState.users.push(guestUser);
+            if (window.cloudDB && window.cloudDB.savePlayerAccount) {
+                await window.cloudDB.savePlayerAccount(guestUser);
+            }
             appState.currentUser = { name: gamerTag, email };
             saveData();
             renderUserNav();
@@ -1407,6 +1448,42 @@ if (inputState.action) fireLaser();</pre>
             closeAuthModal();
             showToast(`Instant Guest Pass activated as ${gamerTag}!`, 'success');
             if (pending) launchGame(pending);
+        }
+
+        async function handleAddAdminAccount(e) {
+            e.preventDefault();
+            const usernameInput = (document.getElementById('new-admin-username').value || '').trim();
+            const passInput = (document.getElementById('new-admin-password').value || '').trim();
+            if (!usernameInput || !passInput) return;
+
+            const newAdmin = {
+                id: 'adm_' + Date.now(),
+                username: usernameInput,
+                email: usernameInput.includes('@') ? usernameInput.toLowerCase() : `${usernameInput.toLowerCase()}@neonarcade.io`,
+                pass: passInput,
+                role: 'Admin'
+            };
+
+            appState.admins.push(newAdmin);
+            if (window.cloudDB && window.cloudDB.saveAdminAccount) {
+                await window.cloudDB.saveAdminAccount(newAdmin);
+            }
+            e.target.reset();
+            renderAdminDashboard();
+            showToast(`Admin "${usernameInput}" saved to separate Admin Database!`, 'success');
+        }
+
+        async function deleteAdminAccount(adminId) {
+            if (appState.admins.length <= 1) {
+                showToast('Cannot delete the last remaining Admin account!', 'error');
+                return;
+            }
+            appState.admins = appState.admins.filter(a => a.id !== adminId);
+            if (window.cloudDB && window.cloudDB.removeAdminAccount) {
+                await window.cloudDB.removeAdminAccount(adminId);
+            }
+            renderAdminDashboard();
+            showToast('Admin credential removed from database.', 'info');
         }
 
         function logoutUser() {
@@ -1424,6 +1501,79 @@ if (inputState.action) fireLaser();</pre>
             renderUserNav();
             switchTab('lobby');
             showToast('Exited Admin Panel.', 'info');
+        }
+
+        function escapeSqlStr(str) {
+            return String(str || '').replace(/'/g, "''");
+        }
+
+        function exportDatabaseAsSQL() {
+            const lines = [
+                '-- ============================================================================',
+                '-- NEONARCADE LIVE SQL DUMP (ADMIN CREDENTIALS, USERS & HIGH SCORES)',
+                `-- Exported on: ${new Date().toISOString()}`,
+                '-- ============================================================================',
+                '',
+                'CREATE TABLE IF NOT EXISTS admin_accounts (',
+                '    id VARCHAR(64) PRIMARY KEY,',
+                '    username VARCHAR(100) NOT NULL UNIQUE,',
+                '    email VARCHAR(150) NOT NULL UNIQUE,',
+                '    password_hash VARCHAR(255) NOT NULL,',
+                '    role VARCHAR(50) DEFAULT \'Admin\'',
+                ');',
+                ''
+            ];
+
+            appState.admins.forEach(a => {
+                lines.push(`INSERT INTO admin_accounts (id, username, email, password_hash, role) VALUES ('${escapeSqlStr(a.id)}', '${escapeSqlStr(a.username)}', '${escapeSqlStr(a.email)}', '${escapeSqlStr(a.pass)}', '${escapeSqlStr(a.role || 'Admin')}');`);
+            });
+
+            lines.push(
+                '',
+                'CREATE TABLE IF NOT EXISTS player_accounts (',
+                '    id VARCHAR(64) PRIMARY KEY,',
+                '    username VARCHAR(100) NOT NULL UNIQUE,',
+                '    email VARCHAR(150) NOT NULL UNIQUE,',
+                '    password_hash VARCHAR(255) NOT NULL,',
+                '    joined_date DATE NOT NULL',
+                ');',
+                ''
+            );
+
+            appState.users.forEach(u => {
+                lines.push(`INSERT INTO player_accounts (id, username, email, password_hash, joined_date) VALUES ('${escapeSqlStr(u.id)}', '${escapeSqlStr(u.name)}', '${escapeSqlStr(u.email)}', '${escapeSqlStr(u.pass)}', '${escapeSqlStr(u.joined || getFormattedDate())}');`);
+            });
+
+            lines.push(
+                '',
+                'CREATE TABLE IF NOT EXISTS score_records (',
+                '    id INT AUTO_INCREMENT PRIMARY KEY,',
+                '    game_id VARCHAR(64) NOT NULL,',
+                '    player_username VARCHAR(100) NOT NULL,',
+                '    score INT NOT NULL,',
+                '    achieved_date DATE NOT NULL',
+                ');',
+                ''
+            );
+
+            Object.keys(appState.scoreHistory || {}).forEach(gameId => {
+                const recs = appState.scoreHistory[gameId] || [];
+                recs.forEach(r => {
+                    lines.push(`INSERT INTO score_records (game_id, player_username, score, achieved_date) VALUES ('${escapeSqlStr(gameId)}', '${escapeSqlStr(r.user)}', ${Number(r.score) || 0}, '${escapeSqlStr(r.date || getFormattedDate())}');`);
+                });
+            });
+
+            const sqlContent = lines.join('\n');
+            const blob = new Blob([sqlContent], { type: 'application/sql' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `neonarcade_backup_${getFormattedDate()}.sql`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Downloaded neonarcade_backup.sql with all credentials & users!', 'success');
         }
 
         /********************************************************************
@@ -1522,15 +1672,21 @@ if (inputState.action) fireLaser();</pre>
 
             appState.games.unshift(newGame);
             saveData();
+            if (window.cloudDB && window.cloudDB.saveCustomGame) {
+                window.cloudDB.saveCustomGame(newGame);
+            }
             e.target.reset();
             renderAdminDashboard();
             renderUserNav();
-            showToast(`"${title}" published to the Arcade Lobby!`, 'success');
+            showToast(`"${title}" published to the Arcade Database!`, 'success');
         }
 
         function deleteGame(gameId) {
             appState.games = appState.games.filter(g => g.id !== gameId);
             saveData();
+            if (window.cloudDB && window.cloudDB.removeCustomGame) {
+                window.cloudDB.removeCustomGame(gameId);
+            }
             renderAdminDashboard();
             renderUserNav();
             showToast('Game removed from catalog.', 'info');
@@ -1570,19 +1726,39 @@ if (inputState.action) fireLaser();</pre>
             `).join('');
 
             const usersList = document.getElementById('admin-users-list');
-            usersList.innerHTML = appState.users.map(u => `
-                <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl text-xs">
-                    <div>
-                        <span class="font-arcade font-bold text-white">${u.name}</span>
-                        <span class="text-slate-400 ml-2">${u.email}</span>
+            if (appState.users.length === 0) {
+                usersList.innerHTML = `<div class="text-xs text-slate-400 py-3 text-center">No players registered in the database yet.</div>`;
+            } else {
+                usersList.innerHTML = appState.users.map(u => `
+                    <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl text-xs">
+                        <div>
+                            <span class="font-arcade font-bold text-white">${u.name}</span>
+                            <span class="text-slate-400 ml-2">${u.email}</span>
+                        </div>
+                        <span class="text-[11px] text-emerald-400">${u.joined || 'Active'}</span>
                     </div>
-                    <span class="text-[11px] text-emerald-400">${u.joined || 'Active'}</span>
-                </div>
-            `).join('');
+                `).join('');
+            }
+
+            const adminsList = document.getElementById('admin-accounts-db-list');
+            if (adminsList) {
+                adminsList.innerHTML = appState.admins.map(a => `
+                    <div class="flex items-center justify-between bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl text-xs">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-key text-neonCyan"></i>
+                            <span class="font-arcade font-bold text-white">${a.username}</span>
+                            <span class="text-slate-400">(${a.email})</span>
+                        </div>
+                        <button onclick="deleteAdminAccount('${a.id}')" class="text-rose-400 hover:text-rose-300 text-xs px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/30">
+                            Remove
+                        </button>
+                    </div>
+                `).join('');
+            }
         }
 
         /********************************************************************
-         * 5. UNIVERSAL INPUT ENGINE & GAME ARENA LAUNCHER
+         * 5. UNIFIED CROSS-DEVICE INPUT & GAME ENGINE STATE
          ********************************************************************/
         const canvas = document.getElementById('arcade-canvas');
         const ctx = canvas.getContext('2d');
@@ -3789,7 +3965,137 @@ if (inputState.action) fireLaser();</pre>
             setGameSpeed(appState.gameSpeed);
             renderUserNav();
             renderGamesGrid();
+            initCloudflareD1Database();
         });
+
+        /********************************************************************
+         * 6. CLOUDFLARE D1 SQLITE DATABASE CLIENT (`/api/db`)
+         ********************************************************************/
+        function updateDbStatusBadge(connected, labelText) {
+            const badge = document.getElementById('db-sync-badge');
+            if (!badge) return;
+            if (connected) {
+                badge.className = 'text-[10px] font-arcade uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                badge.innerHTML = `<i class="fa-solid fa-database mr-1"></i> ${labelText || 'Cloudflare D1 SQLite Connected'}`;
+            } else {
+                badge.className = 'text-[10px] font-arcade uppercase px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ${labelText || 'D1 API Offline (Local Fallback)'}`;
+            }
+        }
+
+        async function callD1Api(action, payload = {}) {
+            const response = await fetch('/api/db', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, payload })
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || `HTTP ${response.status}`);
+            }
+            return await response.json();
+        }
+
+        async function syncFromCloudflareD1() {
+            try {
+                const res = await fetch('/api/db', { method: 'GET', headers: { 'Accept': 'application/json' } });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+
+                if (Array.isArray(data.admins) && data.admins.length > 0) {
+                    appState.admins = data.admins;
+                }
+                if (Array.isArray(data.users)) {
+                    appState.users = data.users;
+                }
+                if (data.scoreHistory && typeof data.scoreHistory === 'object') {
+                    appState.scoreHistory = data.scoreHistory;
+                    Object.keys(data.scoreHistory).forEach(gid => {
+                        const list = data.scoreHistory[gid] || [];
+                        if (list.length > 0) {
+                            appState.highScores[gid] = list[0].score;
+                        }
+                    });
+                }
+                if (Array.isArray(data.customGames)) {
+                    appState.games = [...data.customGames, ...DEFAULT_GAMES];
+                }
+
+                updateDbStatusBadge(true, 'Cloudflare D1 (neon-arcade-db) Live');
+                renderUserNav();
+                renderGamesGrid();
+                if (appState.activeGameId) renderArenaLeaderboard(appState.activeGameId);
+                if (!document.getElementById('view-leaderboard').classList.contains('hidden')) renderLeaderboard();
+                if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminDashboard();
+            } catch (err) {
+                console.warn('Cloudflare D1 /api/db endpoint not reachable yet:', err.message);
+                updateDbStatusBadge(false, 'Add functions/api/db.js to Repo');
+            }
+        }
+
+        function initCloudflareD1Database() {
+            window.cloudDB = {
+                savePlayerAccount: async (playerObj) => {
+                    try {
+                        await callD1Api('register_player', playerObj);
+                        await syncFromCloudflareD1();
+                    } catch (e) {
+                        console.error('D1 savePlayerAccount error:', e);
+                    }
+                },
+                saveAdminAccount: async (adminObj) => {
+                    try {
+                        await callD1Api('add_admin', adminObj);
+                        await syncFromCloudflareD1();
+                    } catch (e) {
+                        console.error('D1 saveAdminAccount error:', e);
+                    }
+                },
+                removeAdminAccount: async (adminId) => {
+                    try {
+                        await callD1Api('delete_admin', { id: adminId });
+                        await syncFromCloudflareD1();
+                    } catch (e) {
+                        console.error('D1 removeAdminAccount error:', e);
+                    }
+                },
+                saveGameScoreRecord: async (gameId, recordsList, latestEntry) => {
+                    try {
+                        const topEntry = latestEntry || (recordsList && recordsList[0]);
+                        if (!topEntry) return;
+                        await callD1Api('save_score', {
+                            gameId,
+                            user: topEntry.user,
+                            score: topEntry.score,
+                            date: topEntry.date
+                        });
+                        await syncFromCloudflareD1();
+                    } catch (e) {
+                        console.error('D1 saveGameScoreRecord error:', e);
+                    }
+                },
+                saveCustomGame: async (gameObj) => {
+                    try {
+                        await callD1Api('add_game', gameObj);
+                        await syncFromCloudflareD1();
+                    } catch (e) {
+                        console.error('D1 saveCustomGame error:', e);
+                    }
+                },
+                removeCustomGame: async (gameId) => {
+                    try {
+                        await callD1Api('delete_game', { id: gameId });
+                        await syncFromCloudflareD1();
+                    } catch (e) {
+                        console.error('D1 removeCustomGame error:', e);
+                    }
+                }
+            };
+
+            // Initial fetch + periodic 15s sync for multi-user leaderboards
+            syncFromCloudflareD1();
+            setInterval(syncFromCloudflareD1, 15000);
+        }
     </script>
 </body>
 </html>
