@@ -2,8 +2,16 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>NeonArcade - Play 10+ Free Browser Arcade Games</title>
+    <!-- PWA & iOS / Android Web App Installer Meta Tags -->
+    <meta name="theme-color" content="#080811">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NeonArcade">
+    <link id="pwa-apple-icon" rel="apple-touch-icon" href="https://placehold.co/192x192/0a0a18/00f3ff.png?text=NA">
+    <link id="pwa-manifest-link" rel="manifest" href="">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
@@ -184,6 +192,10 @@
                     <i class="fa-solid fa-circle-question text-emerald-400"></i>
                     <span class="hidden lg:inline">How to Add Games</span>
                 </button>
+                <button onclick="openWebInstallerModal()" id="nav-install-app" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1.5" title="Install App on Android or iPhone">
+                    <i class="fa-solid fa-mobile-screen-button text-emerald-400"></i>
+                    <span class="hidden sm:inline">Install App</span>
+                </button>
             </nav>
 
             <!-- User Auth Status Area -->
@@ -222,6 +234,14 @@
                     </p>
                     <div id="hero-cta-container" class="pt-2 flex flex-wrap gap-3">
                         <!-- Dynamically shows Register CTA if logged out, or Player Stats if logged in -->
+                    </div>
+                    <!-- Mobile App Install Banner inside Hero -->
+                    <div class="pt-1 flex flex-wrap items-center gap-2">
+                        <button onclick="openWebInstallerModal()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/40 text-emerald-300 font-arcade font-bold text-[11px] uppercase tracking-wider flex items-center gap-2 transition shadow-md">
+                            <i class="fa-brands fa-apple text-white text-sm"></i>
+                            <i class="fa-brands fa-android text-emerald-400 text-sm"></i>
+                            <span>Install Web App on Phone (iOS & Android)</span>
+                        </button>
                     </div>
                 </div>
                 <!-- Decorative background glow -->
@@ -866,14 +886,97 @@ if (inputState.action) fireLaser();</pre>
         </div>
     </div>
 
-    <!-- FOOTER -->
+    <!-- ==================== PHONE WEB APP INSTALLER MODAL (ANDROID & IPHONE) ==================== -->
+    <div id="installer-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-[#121226] border-2 border-emerald-500/50 rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl relative">
+            <button onclick="closeWebInstallerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-5">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-neonCyan mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-3">
+                    <i class="fa-solid fa-mobile-screen-button text-2xl text-slate-950"></i>
+                </div>
+                <h3 class="font-arcade font-black text-xl sm:text-2xl text-white">INSTALL NEONARCADE APP</h3>
+                <p class="text-xs text-slate-400 mt-1">
+                    Add NeonArcade to your phone's Home Screen for full-screen arcade gaming with zero browser bars!
+                </p>
+            </div>
+
+            <!-- Android 1-Click Direct Prompt (Shown when Chrome/Edge supports beforeinstallprompt) -->
+            <div id="android-direct-install-box" class="hidden mb-4 p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/40 text-center space-y-2.5">
+                <div class="text-xs font-semibold text-emerald-300">
+                    <i class="fa-brands fa-android mr-1"></i> Instant Android / Chrome Install Ready!
+                </div>
+                <button onclick="triggerNativeInstallPrompt()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-neonCyan text-slate-950 font-arcade font-black text-xs uppercase tracking-wider shadow-lg">
+                    <i class="fa-solid fa-download mr-1.5"></i> Tap to Install App Now
+                </button>
+            </div>
+
+            <!-- Platform Tabs: iPhone (iOS) vs Android -->
+            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-xl mb-4 border border-slate-800">
+                <button type="button" id="tab-ios-install" onclick="switchInstallerTab('ios')" class="py-2 rounded-lg font-arcade font-bold text-xs uppercase bg-neonCyan text-slate-950 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-brands fa-apple text-sm"></i> iPhone / iOS
+                </button>
+                <button type="button" id="tab-android-install" onclick="switchInstallerTab('android')" class="py-2 rounded-lg font-arcade font-bold text-xs uppercase text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+                    <i class="fa-brands fa-android text-sm"></i> Android
+                </button>
+            </div>
+
+            <!-- iPhone / iOS Instructions -->
+            <div id="installer-content-ios" class="space-y-3 text-xs text-slate-300 bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-neonCyan font-arcade font-bold flex items-center justify-center shrink-0">1</span>
+                    <p>Open this page in <strong>Safari</strong> on your iPhone or iPad and tap the <strong>Share</strong> button <span class="inline-block px-1.5 py-0.5 rounded bg-slate-800 text-neonCyan border border-slate-700"><i class="fa-solid fa-arrow-up-from-bracket"></i></span> at the bottom of the screen.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-neonCyan font-arcade font-bold flex items-center justify-center shrink-0">2</span>
+                    <p>Scroll down the share sheet and tap <strong>"Add to Home Screen"</strong> <span class="inline-block px-1.5 py-0.5 rounded bg-slate-800 text-white border border-slate-700"><i class="fa-regular fa-square-plus"></i></span>.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-neonCyan font-arcade font-bold flex items-center justify-center shrink-0">3</span>
+                    <p>Tap <strong>"Add"</strong> in the top-right corner. Launch <strong>NeonArcade</strong> directly from your iPhone Home Screen like a native app!</p>
+                </div>
+            </div>
+
+            <!-- Android Instructions -->
+            <div id="installer-content-android" class="hidden space-y-3 text-xs text-slate-300 bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-arcade font-bold flex items-center justify-center shrink-0">1</span>
+                    <p>Tap the <strong>Install App Now</strong> button above (if visible) OR tap the browser menu icon <span class="inline-block px-1.5 py-0.5 rounded bg-slate-800 text-white border border-slate-700"><i class="fa-solid fa-ellipsis-vertical"></i></span> in the top-right corner of Chrome.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-arcade font-bold flex items-center justify-center shrink-0">2</span>
+                    <p>Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong> <span class="inline-block px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700"><i class="fa-solid fa-mobile-screen"></i></span>.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-arcade font-bold flex items-center justify-center shrink-0">3</span>
+                    <p>Confirm by tapping <strong>Install</strong>. The NeonArcade icon will appear in your Android App Drawer!</p>
+                </div>
+            </div>
+
+            <button onclick="closeWebInstallerModal()" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-arcade font-bold text-xs uppercase tracking-wider transition">
+                Got It
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER WITH RELEASE VERSION AT BOTTOM OF PAGE -->
     <footer class="border-t border-slate-800/80 bg-[#06060d] py-6 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-                <span class="font-arcade font-bold text-white">NEON<span class="text-neonPink">ARCADE</span></span>
-                <span>— Play 10+ Responsive Browser Games on Desktop, Tablet & Mobile</span>
+            <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left">
+                <div class="flex items-center gap-2">
+                    <span class="font-arcade font-bold text-white">NEON<span class="text-neonPink">ARCADE</span></span>
+                    <span>— Play 13+ Responsive Browser Games on Desktop, Tablet & Mobile</span>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-neonCyan font-arcade text-[10px] tracking-wider">
+                    <i class="fa-solid fa-code-branch text-[9px]"></i> Release v3.6.0 (Build 2026.11.15)
+                </span>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <button onclick="openWebInstallerModal()" class="text-emerald-400 hover:underline flex items-center gap-1 font-semibold">
+                    <i class="fa-solid fa-download text-[10px]"></i> Install Phone App
+                </button>
                 <button onclick="switchTab('lobby')" class="hover:text-neonCyan">Lobby</button>
                 <button onclick="switchTab('leaderboard')" class="hover:text-neonCyan">High Scores</button>
                 <button onclick="openAuthModal('admin')" class="hover:text-neonPink flex items-center gap-1"><i class="fa-solid fa-lock text-[10px]"></i> Admin Login</button>
@@ -887,6 +990,17 @@ if (inputState.action) fireLaser();</pre>
          * 1. INITIAL STATE, 10 BUILT-IN GAMES CATALOG & STORAGE MANAGEMENT
          ********************************************************************/
         const DEFAULT_GAMES = [
+            {
+                id: 'magic_bottle_sort',
+                title: 'Magic Bottle Sort',
+                category: 'Puzzle',
+                icon: '🧪',
+                type: 'builtin',
+                gradient: 'from-fuchsia-500/20 via-purple-500/20 to-cyan-500/20',
+                badgeColor: 'text-neonCyan border-cyan-500/40',
+                desc: 'Pour glowing neon liquids between glass bottles until each bottle holds a single pure color! You can only pour onto the same color or into an empty bottle.',
+                controls: 'Tap/Click a bottle to pick it up, then tap another bottle to pour (or use Left/Right + FIRE on Gamepad/Keyboard).'
+            },
             {
                 id: 'typing_invaders',
                 title: 'Typing Invaders',
@@ -2684,6 +2798,7 @@ if (inputState.action) fireLaser();</pre>
         function startBuiltinGame(id) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             switch (id) {
+                case 'magic_bottle_sort': initBottleSortGame(); break;
                 case 'typing_invaders': initTypingInvadersGame(); break;
                 case 'cyber_tank': initTankGame(); break;
                 case 'neon_snake': initSnakeGame(); break;
@@ -2698,6 +2813,449 @@ if (inputState.action) fireLaser();</pre>
                 case 'cyber_2048': init2048Game(); break;
                 default: initTankGame();
             }
+        }
+
+        /********************************************************************
+         * GAME 000: MAGIC BOTTLE SORT (WATER SORTING PUZZLE)
+         ********************************************************************/
+        function initBottleSortGame() {
+            const CAPACITY = 4;
+            const LIQUID_PALETTE = [
+                { id: 0, name: 'Red', fill: '#ef4444', top: '#f87171' },
+                { id: 1, name: 'Blue', fill: '#2563eb', top: '#60a5fa' },
+                { id: 2, name: 'Yellow', fill: '#eab308', top: '#fde047' },
+                { id: 3, name: 'Green', fill: '#16a34a', top: '#4ade80' },
+                { id: 4, name: 'Pink', fill: '#ec4899', top: '#f472b6' },
+                { id: 5, name: 'Purple', fill: '#9333ea', top: '#c084fc' },
+                { id: 6, name: 'Cyan', fill: '#06b6d4', top: '#67e8f9' },
+                { id: 7, name: 'Orange', fill: '#f97316', top: '#fdba74' }
+            ];
+
+            let level = 1;
+            let moves = 0;
+            let bottles = []; // Array of arrays (bottom to top color indices)
+            let bottleRects = []; // Hitboxes for tap/click & cursor rendering
+            let selectedIdx = -1;
+            let cursorIdx = 0;
+            let moveHistory = [];
+            let pourAnim = null; // { fromIdx, toIdx, colorId, progress }
+            let sparkles = [];
+            let levelBannerTimer = 70;
+
+            function setupLevel(lvl) {
+                const numColors = Math.min(8, 3 + Math.floor((lvl + 1) / 2)); // Level 1: 4 colors, scales up to 8
+                const numEmpty = 2;
+                const totalBottles = numColors + numEmpty;
+
+                // Start from solved state and perform valid reverse-shuffles so every level is 100% solvable
+                let pool = [];
+                for (let c = 0; c < numColors; c++) {
+                    for (let k = 0; k < CAPACITY; k++) pool.push(c);
+                }
+                // Shuffle pool thoroughly
+                for (let i = pool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+
+                bottles = [];
+                for (let b = 0; b < numColors; b++) {
+                    bottles.push(pool.slice(b * CAPACITY, (b + 1) * CAPACITY));
+                }
+                // Avoid starting with an already-completed bottle
+                bottles.forEach((btl, idx) => {
+                    if (btl.every(c => c === btl[0])) {
+                        const nextIdx = (idx + 1) % numColors;
+                        const tmp = btl[CAPACITY - 1];
+                        btl[CAPACITY - 1] = bottles[nextIdx][0];
+                        bottles[nextIdx][0] = tmp;
+                    }
+                });
+
+                for (let e = 0; e < numEmpty; e++) {
+                    bottles.push([]);
+                }
+
+                selectedIdx = -1;
+                cursorIdx = 0;
+                moveHistory = [];
+                pourAnim = null;
+                levelBannerTimer = 65;
+                computeBottleLayout(totalBottles);
+            }
+
+            function computeBottleLayout(count) {
+                bottleRects = [];
+                const isTwoRows = count > 6;
+                const row1Count = isTwoRows ? Math.ceil(count / 2) : count;
+                const row2Count = isTwoRows ? count - row1Count : 0;
+
+                const bw = isTwoRows ? 46 : 52;
+                const bh = isTwoRows ? 132 : 162;
+
+                // Row 1
+                const spacing1 = Math.min(76, (canvas.width - 50) / row1Count);
+                const startX1 = (canvas.width - (row1Count - 1) * spacing1) / 2 - bw / 2;
+                const y1 = isTwoRows ? 64 : 122;
+
+                for (let i = 0; i < row1Count; i++) {
+                    bottleRects.push({
+                        x: startX1 + i * spacing1,
+                        y: y1,
+                        w: bw,
+                        h: bh
+                    });
+                }
+
+                // Row 2
+                if (row2Count > 0) {
+                    const spacing2 = Math.min(76, (canvas.width - 50) / row2Count);
+                    const startX2 = (canvas.width - (row2Count - 1) * spacing2) / 2 - bw / 2;
+                    const y2 = 228;
+                    for (let i = 0; i < row2Count; i++) {
+                        bottleRects.push({
+                            x: startX2 + i * spacing2,
+                            y: y2,
+                            w: bw,
+                            h: bh
+                        });
+                    }
+                }
+            }
+
+            function spawnSparkles(x, y, colorHex, count = 18) {
+                for (let i = 0; i < count; i++) {
+                    const ang = Math.random() * Math.PI * 2;
+                    const spd = 1 + Math.random() * 3.4;
+                    sparkles.push({
+                        x, y,
+                        vx: Math.cos(ang) * spd,
+                        vy: Math.sin(ang) * spd - 1,
+                        life: 28,
+                        color: colorHex
+                    });
+                }
+            }
+
+            function isBottleCompleted(btl) {
+                return btl.length === CAPACITY && btl.every(c => c === btl[0]);
+            }
+
+            function checkLevelWin() {
+                return bottles.every(btl => btl.length === 0 || isBottleCompleted(btl));
+            }
+
+            function canPour(fromIdx, toIdx) {
+                if (fromIdx === toIdx) return false;
+                const src = bottles[fromIdx];
+                const dst = bottles[toIdx];
+                if (!src || !dst || src.length === 0 || dst.length >= CAPACITY) return false;
+                if (dst.length === 0) return true;
+                return src[src.length - 1] === dst[dst.length - 1];
+            }
+
+            function performPour(fromIdx, toIdx) {
+                const src = bottles[fromIdx];
+                const dst = bottles[toIdx];
+                const colorToMove = src[src.length - 1];
+
+                // Save snapshot for Undo
+                moveHistory.push(bottles.map(b => [...b]));
+                if (moveHistory.length > 20) moveHistory.shift();
+
+                let pouredUnits = 0;
+                while (src.length > 0 && dst.length < CAPACITY && src[src.length - 1] === colorToMove) {
+                    dst.push(src.pop());
+                    pouredUnits++;
+                }
+
+                moves++;
+                selectedIdx = -1;
+                playArcadeSound('bounce');
+                triggerGamepadVibration(30, 0.35, 0.5);
+                addScore(pouredUnits * 15);
+
+                const dstRect = bottleRects[toIdx];
+                const pal = LIQUID_PALETTE[colorToMove] || LIQUID_PALETTE[0];
+                pourAnim = {
+                    fromIdx,
+                    toIdx,
+                    colorHex: pal.fill,
+                    timer: 14
+                };
+
+                // If bottle is now a pure completed 4-stack, celebrate!
+                if (isBottleCompleted(dst)) {
+                    playArcadeSound('powerup');
+                    triggerGamepadVibration(110, 0.65, 0.85);
+                    addScore(60);
+                    if (dstRect) spawnSparkles(dstRect.x + dstRect.w / 2, dstRect.y + 20, pal.top, 22);
+                }
+
+                // Check if entire level is solved
+                if (checkLevelWin()) {
+                    playArcadeSound('score');
+                    triggerGamepadVibration(180, 0.8, 1.0);
+                    addScore(150 + level * 25);
+                    showToast(`✨ LEVEL ${level} SOLVED! +${150 + level * 25} Bonus!`, 'success');
+                    level++;
+                    setTimeout(() => {
+                        if (!isGameOver && appState.activeGameId === 'magic_bottle_sort') {
+                            setupLevel(level);
+                        }
+                    }, 750);
+                }
+            }
+
+            function undoLastMove() {
+                if (moveHistory.length === 0) return;
+                bottles = moveHistory.pop();
+                selectedIdx = -1;
+                playArcadeSound('hit');
+                triggerGamepadVibration(25, 0.3, 0.4);
+            }
+
+            function handleBottleSelect(idx) {
+                if (idx < 0 || idx >= bottles.length) return;
+                cursorIdx = idx;
+
+                if (selectedIdx === -1) {
+                    if (bottles[idx].length > 0) {
+                        selectedIdx = idx;
+                        playArcadeSound('coin');
+                        triggerGamepadVibration(20, 0.25, 0.35);
+                    }
+                } else if (selectedIdx === idx) {
+                    selectedIdx = -1;
+                    playArcadeSound('bounce');
+                } else if (canPour(selectedIdx, idx)) {
+                    performPour(selectedIdx, idx);
+                } else {
+                    // If user tapped another non-empty bottle that can't receive, switch selection to it
+                    if (bottles[idx].length > 0) {
+                        selectedIdx = idx;
+                        playArcadeSound('hit');
+                        triggerGamepadVibration(40, 0.4, 0.5);
+                    } else {
+                        selectedIdx = -1;
+                    }
+                }
+            }
+
+            // Touch / Mouse Click on Bottles or Undo Button
+            inputState.onCanvasClick = (x, y) => {
+                // Top-Right Undo Button Hitbox (x: 425..508, y: 7..31)
+                if (x >= 420 && x <= 512 && y >= 5 && y <= 34) {
+                    undoLastMove();
+                    return;
+                }
+
+                for (let i = 0; i < bottleRects.length; i++) {
+                    const r = bottleRects[i];
+                    if (x >= r.x - 8 && x <= r.x + r.w + 8 && y >= r.y - 24 && y <= r.y + r.h + 10) {
+                        handleBottleSelect(i);
+                        return;
+                    }
+                }
+            };
+
+            // Keyboard / Mobile D-Pad / Xbox Controller Navigation
+            inputState.onDirectionTap = (dir) => {
+                const count = bottles.length;
+                if (count === 0) return;
+                if (dir === 'left') cursorIdx = (cursorIdx - 1 + count) % count;
+                else if (dir === 'right') cursorIdx = (cursorIdx + 1) % count;
+                else if (dir === 'up' || dir === 'down') {
+                    const half = Math.ceil(count / 2);
+                    if (count > 6) {
+                        cursorIdx = (cursorIdx + half) % count;
+                    }
+                }
+                triggerGamepadVibration(15, 0.2, 0.25);
+            };
+
+            inputState.onActionTap = () => {
+                handleBottleSelect(cursorIdx);
+            };
+
+            setupLevel(level);
+
+            function drawGlassBottle(idx) {
+                const r = bottleRects[idx];
+                const btl = bottles[idx];
+                if (!r || !btl) return;
+
+                const isSelected = idx === selectedIdx;
+                const isCursor = idx === cursorIdx;
+                const isDone = isBottleCompleted(btl);
+                const liftY = isSelected ? -20 : 0;
+
+                const bx = r.x;
+                const by = r.y + liftY;
+                const bw = r.w;
+                const bh = r.h;
+                const neckW = bw * 0.68;
+                const neckX = bx + (bw - neckW) / 2;
+                const neckH = 15;
+                const bodyY = by + neckH;
+                const bodyH = bh - neckH;
+                const unitH = (bodyH - 10) / CAPACITY;
+
+                ctx.save();
+
+                // Selection / Cursor Glow
+                if (isSelected || isCursor) {
+                    ctx.shadowBlur = isSelected ? 18 : 10;
+                    ctx.shadowColor = isSelected ? '#00f3ff' : '#ff007f';
+                }
+
+                // Draw Liquid Layers inside Bottle (Bottom to Top)
+                for (let slot = 0; slot < btl.length; slot++) {
+                    const colorId = btl[slot];
+                    const pal = LIQUID_PALETTE[colorId] || LIQUID_PALETTE[0];
+                    const ly = by + bh - 5 - (slot + 1) * unitH;
+
+                    ctx.fillStyle = pal.fill;
+                    ctx.beginPath();
+                    if (slot === 0) {
+                        ctx.roundRect(bx + 4, ly, bw - 8, unitH + 1, [0, 0, 12, 12]);
+                    } else {
+                        ctx.rect(bx + 4, ly, bw - 8, unitH + 1);
+                    }
+                    ctx.fill();
+
+                    // Liquid Meniscus Highlight on Top Layer
+                    if (slot === btl.length - 1) {
+                        ctx.fillStyle = pal.top;
+                        ctx.beginPath();
+                        ctx.ellipse(bx + bw / 2, ly + 2, (bw - 10) / 2, 3.5, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Glass Bottle Outer Contour
+                ctx.lineWidth = isSelected ? 3 : isDone ? 2.5 : 2;
+                ctx.strokeStyle = isSelected ? '#00f3ff' : isDone ? '#00ff66' : isCursor ? '#ff007f' : 'rgba(148, 163, 184, 0.75)';
+
+                // Bottle Rim & Neck
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.beginPath();
+                ctx.roundRect(neckX - 3, by, neckW + 6, 6, 3);
+                ctx.fill();
+                ctx.stroke();
+
+                // Bottle Body
+                ctx.beginPath();
+                ctx.roundRect(bx, bodyY, bw, bodyH, [8, 8, 16, 16]);
+                ctx.fill();
+                ctx.stroke();
+
+                // Vertical Glass Reflection Highlight
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+                ctx.fillRect(bx + 6, bodyY + 8, 4, bodyH - 20);
+
+                // Completed Bottle Crown / Star Badge
+                if (isDone) {
+                    ctx.font = '14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('✨', bx + bw / 2, by - 4);
+                    ctx.textAlign = 'start';
+                }
+
+                // Cursor Triangle Indicator below Bottle
+                if (isCursor) {
+                    ctx.fillStyle = isSelected ? '#00f3ff' : '#ff007f';
+                    ctx.beginPath();
+                    ctx.moveTo(bx + bw / 2, r.y + bh + 6);
+                    ctx.lineTo(bx + bw / 2 - 5, r.y + bh + 13);
+                    ctx.lineTo(bx + bw / 2 + 5, r.y + bh + 13);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            function loop() {
+                if (isGameOver) return;
+                if (isGamePaused) {
+                    activeLoopId = requestAnimationFrame(loop);
+                    return;
+                }
+
+                const spd = appState.gameSpeed;
+                if (levelBannerTimer > 0) levelBannerTimer -= spd;
+
+                // Royal Deep Purple Gradient Backdrop (Matches Magic Sort Screenshot)
+                const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                grad.addColorStop(0, '#180836');
+                grad.addColorStop(0.55, '#0c0822');
+                grad.addColorStop(1, '#060512');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Top HUD Bar
+                ctx.fillStyle = 'rgba(7, 7, 20, 0.85)';
+                ctx.fillRect(8, 6, canvas.width - 16, 28);
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.35)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(8, 6, canvas.width - 16, 28);
+
+                ctx.font = 'bold 11px Orbitron, sans-serif';
+                ctx.fillStyle = '#00f3ff';
+                ctx.fillText(`LEVEL ${level}`, 18, 24);
+
+                ctx.fillStyle = '#fde047';
+                ctx.fillText(`MOVES: ${moves}`, 115, 24);
+
+                ctx.fillStyle = '#cbd5e1';
+                ctx.font = '11px Inter, sans-serif';
+                ctx.fillText(selectedIdx === -1 ? 'Tap a bottle to pick up' : 'Tap target bottle to pour', 215, 24);
+
+                // Undo Button inside Canvas Top-Right
+                ctx.fillStyle = moveHistory.length > 0 ? '#ff007f' : '#334155';
+                ctx.beginPath();
+                ctx.roundRect(425, 9, 82, 22, 6);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px Orbitron, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('↩ UNDO', 466, 23);
+                ctx.textAlign = 'start';
+
+                // Pouring Stream Effect
+                if (pourAnim && pourAnim.timer > 0) {
+                    pourAnim.timer -= spd;
+                    const rFrom = bottleRects[pourAnim.fromIdx];
+                    const rTo = bottleRects[pourAnim.toIdx];
+                    if (rFrom && rTo) {
+                        ctx.strokeStyle = pourAnim.colorHex;
+                        ctx.lineWidth = 5;
+                        ctx.beginPath();
+                        ctx.moveTo(rFrom.x + rFrom.w / 2, rFrom.y - 8);
+                        ctx.lineTo(rTo.x + rTo.w / 2, rTo.y + 18);
+                        ctx.stroke();
+                    }
+                }
+
+                // Draw All Glass Bottles
+                for (let i = 0; i < bottles.length; i++) {
+                    drawGlassBottle(i);
+                }
+
+                // Update & Draw Sparkles
+                sparkles.forEach(s => {
+                    s.x += s.vx * spd;
+                    s.y += s.vy * spd;
+                    s.life -= spd;
+                    ctx.fillStyle = s.color;
+                    ctx.fillRect(s.x - 2, s.y - 2, 4, 4);
+                });
+                sparkles = sparkles.filter(s => s.life > 0);
+
+                activeLoopId = requestAnimationFrame(loop);
+            }
+            loop();
         }
 
         /********************************************************************
@@ -4628,8 +5186,137 @@ if (inputState.action) fireLaser();</pre>
             renderUserNav();
             renderGamesGrid();
             initCloudflareD1Database();
+            initWebAppInstaller();
             requestAnimationFrame(pollXboxGamepad);
         });
+
+        /********************************************************************
+         * 5B. PROGRESSIVE WEB APP (PWA) INSTALLER FOR ANDROID & IPHONE
+         ********************************************************************/
+        let deferredInstallPrompt = null;
+
+        function generateAppIconDataUrl(size = 192) {
+            const c = document.createElement('canvas');
+            c.width = size;
+            c.height = size;
+            const ictx = c.getContext('2d');
+
+            // Rounded Dark Cyber Background
+            const grad = ictx.createLinearGradient(0, 0, size, size);
+            grad.addColorStop(0, '#ff007f');
+            grad.addColorStop(0.5, '#1e1b4b');
+            grad.addColorStop(1, '#00f3ff');
+            ictx.fillStyle = grad;
+            ictx.fillRect(0, 0, size, size);
+
+            ictx.fillStyle = '#090916';
+            ictx.fillRect(size * 0.06, size * 0.06, size * 0.88, size * 0.88);
+
+            // Neon Arcade Text & Icon
+            ictx.fillStyle = '#00f3ff';
+            ictx.font = `900 ${Math.floor(size * 0.34)}px Orbitron, sans-serif`;
+            ictx.textAlign = 'center';
+            ictx.textBaseline = 'middle';
+            ictx.fillText('NA', size / 2, size * 0.44);
+
+            ictx.fillStyle = '#ff007f';
+            ictx.font = `700 ${Math.floor(size * 0.11)}px Orbitron, sans-serif`;
+            ictx.fillText('ARCADE', size / 2, size * 0.76);
+            return c.toDataURL('image/png');
+        }
+
+        function initWebAppInstaller() {
+            try {
+                const icon192 = generateAppIconDataUrl(192);
+                const icon512 = generateAppIconDataUrl(512);
+
+                const appleIconEl = document.getElementById('pwa-apple-icon');
+                if (appleIconEl) appleIconEl.href = icon192;
+
+                // Create Dynamic Web App Manifest for Android Chrome & iOS 16.4+ PWA Installation
+                const manifestObj = {
+                    name: 'NeonArcade - Free Browser Games',
+                    short_name: 'NeonArcade',
+                    description: 'Play 13+ Free Retro & Cyber Arcade Games on Mobile & Desktop.',
+                    start_url: window.location.href.split('#')[0],
+                    display: 'standalone',
+                    orientation: 'portrait',
+                    background_color: '#080811',
+                    theme_color: '#080811',
+                    icons: [
+                        { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+                        { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+                    ]
+                };
+
+                const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+                const manifestUrl = URL.createObjectURL(manifestBlob);
+                const manifestLink = document.getElementById('pwa-manifest-link');
+                if (manifestLink) manifestLink.setAttribute('href', manifestUrl);
+            } catch (e) {}
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredInstallPrompt = e;
+                const directBox = document.getElementById('android-direct-install-box');
+                if (directBox) directBox.classList.remove('hidden');
+            });
+
+            window.addEventListener('appinstalled', () => {
+                deferredInstallPrompt = null;
+                closeWebInstallerModal();
+                showToast('🎉 NeonArcade installed on your phone Home Screen!', 'success');
+            });
+        }
+
+        function openWebInstallerModal() {
+            const modal = document.getElementById('installer-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            // Automatically show iPhone tab on iOS devices, or Android tab on Android devices
+            if (isIOSDevice()) {
+                switchInstallerTab('ios');
+            } else {
+                switchInstallerTab('android');
+            }
+        }
+
+        function closeWebInstallerModal() {
+            const modal = document.getElementById('installer-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function switchInstallerTab(platform) {
+            const iosTab = document.getElementById('tab-ios-install');
+            const andTab = document.getElementById('tab-android-install');
+            const iosBox = document.getElementById('installer-content-ios');
+            const andBox = document.getElementById('installer-content-android');
+
+            if (platform === 'ios') {
+                iosTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase bg-neonCyan text-slate-950 transition flex items-center justify-center gap-1.5';
+                andTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+                iosBox.classList.remove('hidden');
+                andBox.classList.add('hidden');
+            } else {
+                andTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase bg-emerald-400 text-slate-950 transition flex items-center justify-center gap-1.5';
+                iosTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5';
+                andBox.classList.remove('hidden');
+                iosBox.classList.add('hidden');
+            }
+        }
+
+        async function triggerNativeInstallPrompt() {
+            if (!deferredInstallPrompt) {
+                showToast('Use your browser menu -> "Add to Home screen" to install.', 'info');
+                return;
+            }
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === 'accepted') {
+                deferredInstallPrompt = null;
+                closeWebInstallerModal();
+            }
+        }
 
         /********************************************************************
          * 6. CLOUDFLARE D1 SQLITE DATABASE CLIENT (`/api/db`)
