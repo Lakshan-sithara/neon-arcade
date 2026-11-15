@@ -171,6 +171,10 @@
                     <span class="hidden md:inline-block ml-2 text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
                         Free-to-Play
                     </span>
+                    <span id="network-status-pill" onclick="flushOfflineSyncQueue(true)" class="inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer" title="Tap to force sync offline scores">
+                        <span id="network-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span id="network-status-text">Online</span>
+                    </span>
                 </div>
             </div>
 
@@ -970,7 +974,7 @@ if (inputState.action) fireLaser();</pre>
                     <span>— Play 13+ Responsive Browser Games on Desktop, Tablet & Mobile</span>
                 </div>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-neonCyan font-arcade text-[10px] tracking-wider">
-                    <i class="fa-solid fa-code-branch text-[9px]"></i> Release v3.6.0 (Build 2026.11.15)
+                    <i class="fa-solid fa-code-branch text-[9px]"></i> Release v3.7.0 (Offline-Sync Build)
                 </span>
             </div>
             <div class="flex flex-wrap items-center justify-center gap-4">
@@ -1156,8 +1160,194 @@ if (inputState.action) fireLaser();</pre>
             activeGameId: null,
             gameSpeed: 0.35, // Default game speed set to 0.35x
             typingCategory: 'tech', // Default word category for Typing Invaders ('tech', 'animals', 'planets', 'plants', 'all')
-            soundMuted: false
+            soundMuted: false,
+            offlineQueue: [] // Pending actions recorded while offline to upload when internet returns
         };
+
+        /********************************************************************
+         * 1A. OFFLINE-FIRST INDEXED-DB CACHE & AUTO-UPLOAD SYNC ENGINE
+         ********************************************************************/
+        const IDB_NAME = 'NeonArcadeOfflineDB';
+        const IDB_VERSION = 1;
+        const IDB_STORE = 'keyval';
+
+        function openOfflineIDB() {
+            return new Promise((resolve, reject) => {
+                if (!window.indexedDB) return reject(new Error('IndexedDB not supported'));
+                const req = window.indexedDB.open(IDB_NAME, IDB_VERSION);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(IDB_STORE)) {
+                        db.createObjectStore(IDB_STORE);
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function idbSet(key, val) {
+            try {
+                const db = await openOfflineIDB();
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction(IDB_STORE, 'readwrite');
+                    tx.objectStore(IDB_STORE).put(val, key);
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                });
+            } catch (e) {}
+        }
+
+        async function idbGet(key) {
+            try {
+                const db = await openOfflineIDB();
+                return await new Promise((resolve, reject) => {
+                    const tx = db.transaction(IDB_STORE, 'readonly');
+                    const req = tx.objectStore(IDB_STORE).get(key);
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            } catch (e) {
+                return undefined;
+            }
+        }
+
+        async function loadOfflineStateFromIDB() {
+            const cachedSnapshot = await idbGet('neon_offline_snapshot_v1');
+            if (cachedSnapshot && typeof cachedSnapshot === 'object') {
+                if (cachedSnapshot.currentUser && !appState.currentUser) {
+                    appState.currentUser = cachedSnapshot.currentUser;
+                }
+                if (Array.isArray(cachedSnapshot.users) && cachedSnapshot.users.length > 0 && appState.users.length === 0) {
+                    appState.users = cachedSnapshot.users;
+                }
+                if (cachedSnapshot.highScores && typeof cachedSnapshot.highScores === 'object') {
+                    appState.highScores = { ...cachedSnapshot.highScores, ...appState.highScores };
+                }
+                if (cachedSnapshot.scoreHistory && typeof cachedSnapshot.scoreHistory === 'object') {
+                    Object.keys(cachedSnapshot.scoreHistory).forEach(gid => {
+                        if (!appState.scoreHistory[gid] || appState.scoreHistory[gid].length === 0) {
+                            appState.scoreHistory[gid] = cachedSnapshot.scoreHistory[gid];
+                        }
+                    });
+                }
+                if (Array.isArray(cachedSnapshot.offlineQueue)) {
+                    appState.offlineQueue = cachedSnapshot.offlineQueue;
+                }
+                renderUserNav();
+                renderGamesGrid();
+                updateNetworkStatusUI();
+            }
+        }
+
+        function persistOfflineSnapshot() {
+            idbSet('neon_offline_snapshot_v1', {
+                currentUser: appState.currentUser,
+                users: appState.users,
+                highScores: appState.highScores,
+                scoreHistory: appState.scoreHistory,
+                offlineQueue: appState.offlineQueue
+            });
+        }
+
+        function updateNetworkStatusUI() {
+            const pill = document.getElementById('network-status-pill');
+            const dot = document.getElementById('network-status-dot');
+            const text = document.getElementById('network-status-text');
+            if (!pill || !dot || !text) return;
+
+            const isOnline = navigator.onLine !== false;
+            const pendingCount = (appState.offlineQueue || []).length;
+
+            if (!isOnline) {
+                pill.className = 'inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-pointer';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+                text.textContent = pendingCount > 0 ? `Offline (${pendingCount} Queued)` : 'Offline Mode';
+            } else if (pendingCount > 0) {
+                pill.className = 'inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-neonCyan border border-cyan-500/40 cursor-pointer';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-neonCyan animate-ping';
+                text.textContent = `Syncing (${pendingCount})...`;
+            } else {
+                pill.className = 'inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer';
+                dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+                text.textContent = 'Online • Synced';
+            }
+        }
+
+        function enqueueOfflineAction(action, payload) {
+            if (!Array.isArray(appState.offlineQueue)) appState.offlineQueue = [];
+            // Deduplicate score updates for the same game + player so we only upload the highest score
+            if (action === 'save_score') {
+                const existingIdx = appState.offlineQueue.findIndex(item =>
+                    item.action === 'save_score' &&
+                    item.payload.gameId === payload.gameId &&
+                    (item.payload.user || '').toLowerCase() === (payload.user || '').toLowerCase()
+                );
+                if (existingIdx !== -1) {
+                    if (payload.score > appState.offlineQueue[existingIdx].payload.score) {
+                        appState.offlineQueue[existingIdx].payload = payload;
+                    }
+                    persistOfflineSnapshot();
+                    updateNetworkStatusUI();
+                    return;
+                }
+            }
+            appState.offlineQueue.push({ action, payload, timestamp: Date.now() });
+            persistOfflineSnapshot();
+            updateNetworkStatusUI();
+        }
+
+        let isFlushingQueue = false;
+        async function flushOfflineSyncQueue(manualTrigger = false) {
+            if (isFlushingQueue) return;
+            if (navigator.onLine === false) {
+                if (manualTrigger) showToast('📡 Still offline. Your scores are safely queued and will upload when internet returns!', 'info');
+                updateNetworkStatusUI();
+                return;
+            }
+            if (!appState.offlineQueue || appState.offlineQueue.length === 0) {
+                if (manualTrigger) {
+                    await syncFromCloudflareD1();
+                    showToast('✅ All data is synced with the cloud database!', 'success');
+                }
+                updateNetworkStatusUI();
+                return;
+            }
+
+            isFlushingQueue = true;
+            updateNetworkStatusUI();
+            let uploadedCount = 0;
+
+            try {
+                while (appState.offlineQueue.length > 0) {
+                    const item = appState.offlineQueue[0];
+                    await callD1Api(item.action, item.payload);
+                    appState.offlineQueue.shift();
+                    uploadedCount++;
+                    persistOfflineSnapshot();
+                }
+                if (uploadedCount > 0) {
+                    showToast(`☁️ Uploaded ${uploadedCount} offline record(s) to the cloud database!`, 'success');
+                    await syncFromCloudflareD1();
+                }
+            } catch (err) {
+                console.warn('Offline queue upload paused until server is reachable:', err.message);
+            } finally {
+                isFlushingQueue = false;
+                updateNetworkStatusUI();
+            }
+        }
+
+        window.addEventListener('online', () => {
+            showToast('🌐 Internet connection restored! Uploading offline game data...', 'info');
+            updateNetworkStatusUI();
+            flushOfflineSyncQueue();
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('📴 Offline Mode Active! Keep playing — your scores will auto-upload when back online.', 'info');
+            updateNetworkStatusUI();
+        });
 
         /********************************************************************
          * 1B. RETRO ARCADE WEB AUDIO SYNTHESIZER & XBOX GAMEPAD VIBRATION
@@ -1614,6 +1804,7 @@ if (inputState.action) fireLaser();</pre>
             } catch (e) {
                 // Ignore storage restriction errors in sandboxed iframes
             }
+            persistOfflineSnapshot();
         }
 
         function getFormattedDate() {
@@ -5179,16 +5370,25 @@ if (inputState.action) fireLaser();</pre>
         }
 
         // Initialize App on Load
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             loadSavedData();
+            await loadOfflineStateFromIDB();
             buildVirtualKeyboard();
             setGameSpeed(appState.gameSpeed);
             renderUserNav();
             renderGamesGrid();
+            updateNetworkStatusUI();
             initCloudflareD1Database();
             initWebAppInstaller();
+            registerOfflineServiceWorker();
             requestAnimationFrame(pollXboxGamepad);
         });
+
+        function registerOfflineServiceWorker() {
+            if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            }
+        }
 
         /********************************************************************
          * 5B. PROGRESSIVE WEB APP (PWA) INSTALLER FOR ANDROID & IPHONE
@@ -5371,7 +5571,9 @@ if (inputState.action) fireLaser();</pre>
                     appState.games = [...data.customGames, ...DEFAULT_GAMES];
                 }
 
+                persistOfflineSnapshot();
                 updateDbStatusBadge(true, 'Cloudflare D1 (neon-arcade-db) Live');
+                updateNetworkStatusUI();
                 renderUserNav();
                 renderGamesGrid();
                 if (appState.activeGameId) renderArenaLeaderboard(appState.activeGameId);
@@ -5379,26 +5581,36 @@ if (inputState.action) fireLaser();</pre>
                 if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminDashboard();
             } catch (err) {
                 console.warn('Cloudflare D1 /api/db endpoint not reachable yet:', err.message);
-                updateDbStatusBadge(false, 'Add functions/api/db.js to Repo');
+                updateDbStatusBadge(false, navigator.onLine === false ? 'Offline Mode (Queued)' : 'Local / Offline Ready');
+                updateNetworkStatusUI();
             }
         }
 
         function initCloudflareD1Database() {
             window.cloudDB = {
                 savePlayerAccount: async (playerObj) => {
+                    if (navigator.onLine === false) {
+                        enqueueOfflineAction('register_player', playerObj);
+                        showToast('📴 Saved account offline! Will upload when connected to internet.', 'info');
+                        return;
+                    }
                     try {
                         await callD1Api('register_player', playerObj);
                         await syncFromCloudflareD1();
                     } catch (e) {
-                        console.error('D1 savePlayerAccount error:', e);
+                        enqueueOfflineAction('register_player', playerObj);
                     }
                 },
                 saveAdminAccount: async (adminObj) => {
+                    if (navigator.onLine === false) {
+                        enqueueOfflineAction('add_admin', adminObj);
+                        return;
+                    }
                     try {
                         await callD1Api('add_admin', adminObj);
                         await syncFromCloudflareD1();
                     } catch (e) {
-                        console.error('D1 saveAdminAccount error:', e);
+                        enqueueOfflineAction('add_admin', adminObj);
                     }
                 },
                 removeAdminAccount: async (adminId) => {
@@ -5406,30 +5618,39 @@ if (inputState.action) fireLaser();</pre>
                         await callD1Api('delete_admin', { id: adminId });
                         await syncFromCloudflareD1();
                     } catch (e) {
-                        console.error('D1 removeAdminAccount error:', e);
+                        enqueueOfflineAction('delete_admin', { id: adminId });
                     }
                 },
                 saveGameScoreRecord: async (gameId, recordsList, latestEntry) => {
+                    const topEntry = latestEntry || (recordsList && recordsList[0]);
+                    if (!topEntry) return;
+                    const scorePayload = {
+                        gameId,
+                        user: topEntry.user,
+                        score: topEntry.score,
+                        date: topEntry.date
+                    };
+                    if (navigator.onLine === false) {
+                        enqueueOfflineAction('save_score', scorePayload);
+                        return;
+                    }
                     try {
-                        const topEntry = latestEntry || (recordsList && recordsList[0]);
-                        if (!topEntry) return;
-                        await callD1Api('save_score', {
-                            gameId,
-                            user: topEntry.user,
-                            score: topEntry.score,
-                            date: topEntry.date
-                        });
+                        await callD1Api('save_score', scorePayload);
                         await syncFromCloudflareD1();
                     } catch (e) {
-                        console.error('D1 saveGameScoreRecord error:', e);
+                        enqueueOfflineAction('save_score', scorePayload);
                     }
                 },
                 saveCustomGame: async (gameObj) => {
+                    if (navigator.onLine === false) {
+                        enqueueOfflineAction('add_game', gameObj);
+                        return;
+                    }
                     try {
                         await callD1Api('add_game', gameObj);
                         await syncFromCloudflareD1();
                     } catch (e) {
-                        console.error('D1 saveCustomGame error:', e);
+                        enqueueOfflineAction('add_game', gameObj);
                     }
                 },
                 removeCustomGame: async (gameId) => {
@@ -5437,14 +5658,18 @@ if (inputState.action) fireLaser();</pre>
                         await callD1Api('delete_game', { id: gameId });
                         await syncFromCloudflareD1();
                     } catch (e) {
-                        console.error('D1 removeCustomGame error:', e);
+                        enqueueOfflineAction('delete_game', { id: gameId });
                     }
                 }
             };
 
-            // Initial fetch + periodic 15s sync for multi-user leaderboards
-            syncFromCloudflareD1();
-            setInterval(syncFromCloudflareD1, 15000);
+            // Initial flush + fetch + periodic 15s sync for multi-user leaderboards
+            flushOfflineSyncQueue().then(() => syncFromCloudflareD1());
+            setInterval(() => {
+                if (navigator.onLine !== false) {
+                    flushOfflineSyncQueue().then(() => syncFromCloudflareD1());
+                }
+            }, 15000);
         }
     </script>
 </body>
