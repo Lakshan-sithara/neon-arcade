@@ -742,11 +742,8 @@ if (inputState.action) fireLaser();</pre>
                 </button>
             </form>
 
-            <!-- Instant Demo Account & Admin Login Shortcuts -->
+            <!-- Admin Login Shortcut -->
             <div class="mt-4 pt-4 border-t border-slate-800 text-center space-y-2.5">
-                <button type="button" id="guest-pass-btn" onclick="quickInstantRegister()" class="w-full py-2.5 rounded-xl bg-neonPink/15 hover:bg-neonPink/25 border border-neonPink/40 text-neonPink text-xs font-arcade font-bold uppercase tracking-wider transition">
-                    ⚡ 1-Click Instant Guest Pass (Auto-Register)
-                </button>
                 <button type="button" id="admin-mode-toggle-btn" onclick="switchAuthMode('admin')" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-neonCyan text-xs font-arcade font-bold uppercase tracking-wider transition flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-user-shield text-neonPink"></i> Admin Login
                 </button>
@@ -1294,7 +1291,6 @@ if (inputState.action) fireLaser();</pre>
             const regTab = document.getElementById('tab-register-btn');
             const loginTab = document.getElementById('tab-login-btn');
             const tabsBar = document.getElementById('auth-tabs-bar');
-            const guestBtn = document.getElementById('guest-pass-btn');
             const adminToggleBtn = document.getElementById('admin-mode-toggle-btn');
 
             if (mode === 'register') {
@@ -1303,7 +1299,6 @@ if (inputState.action) fireLaser();</pre>
                 if (identifierLabel) identifierLabel.textContent = 'Email Address *';
                 if (emailInput) emailInput.placeholder = 'player@neonarcade.io';
                 tabsBar.classList.remove('hidden');
-                if (guestBtn) guestBtn.classList.remove('hidden');
                 if (adminToggleBtn) adminToggleBtn.classList.remove('hidden');
                 submitBtn.textContent = 'Create Free Account & Play';
                 regTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase bg-neonCyan text-slate-950 transition';
@@ -1314,7 +1309,6 @@ if (inputState.action) fireLaser();</pre>
                 if (identifierLabel) identifierLabel.textContent = 'Username or Email *';
                 if (emailInput) emailInput.placeholder = 'Enter your username or email';
                 tabsBar.classList.remove('hidden');
-                if (guestBtn) guestBtn.classList.remove('hidden');
                 if (adminToggleBtn) adminToggleBtn.classList.remove('hidden');
                 submitBtn.textContent = 'Login & Enter Arcade';
                 loginTab.className = 'py-2 rounded-lg font-arcade font-bold text-xs uppercase bg-neonCyan text-slate-950 transition';
@@ -1325,7 +1319,6 @@ if (inputState.action) fireLaser();</pre>
                 if (identifierLabel) identifierLabel.textContent = 'Admin Username or Email *';
                 if (emailInput) emailInput.placeholder = 'Enter admin username or email';
                 tabsBar.classList.add('hidden');
-                if (guestBtn) guestBtn.classList.add('hidden');
                 if (adminToggleBtn) adminToggleBtn.classList.add('hidden');
                 submitBtn.textContent = 'Unlock Admin Dashboard';
             }
@@ -1429,25 +1422,6 @@ if (inputState.action) fireLaser();</pre>
 
                 showToast('Incorrect username/email or password! Please register first if you are new.', 'error');
             }
-        }
-
-        async function quickInstantRegister() {
-            const randomId = Math.floor(100 + Math.random() * 900);
-            const gamerTag = `NeonPlayer_${randomId}`;
-            const email = `guest${randomId}@neonarcade.io`;
-            const guestUser = { id: 'usr_' + Date.now(), name: gamerTag, email, pass: 'guest' + randomId, joined: getFormattedDate() };
-            appState.users.push(guestUser);
-            if (window.cloudDB && window.cloudDB.savePlayerAccount) {
-                await window.cloudDB.savePlayerAccount(guestUser);
-            }
-            appState.currentUser = { name: gamerTag, email };
-            saveData();
-            renderUserNav();
-            renderGamesGrid();
-            const pending = appState.pendingGameId;
-            closeAuthModal();
-            showToast(`Instant Guest Pass activated as ${gamerTag}!`, 'success');
-            if (pending) launchGame(pending);
         }
 
         async function handleAddAdminAccount(e) {
