@@ -156,55 +156,54 @@
 </head>
 <body class="min-h-screen flex flex-col bg-[#070710] text-slate-100 overflow-x-hidden">
 
-    <!-- TOP NAVIGATION BAR -->
-    <header class="sticky top-0 z-40 backdrop-blur-md bg-[#0a0a18]/90 border-b border-cyan-500/30 w-full">
-        <div class="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-1.5">
-            <!-- Brand Logo -->
-            <div onclick="switchTab('lobby')" class="flex items-center gap-2 cursor-pointer group shrink-0">
-                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-neonPink to-neonCyan flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
-                    <i class="fa-solid fa-gamepad text-white text-sm sm:text-xl"></i>
-                </div>
-                <div>
+    <!-- TOP NAVIGATION BAR (Responsive 2-Row Wrap on Mobile so Zero Buttons Get Clipped) -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-[#0a0a18]/95 border-b border-cyan-500/30 w-full">
+        <div class="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 py-2 sm:py-0 sm:h-16 flex flex-wrap items-center justify-between gap-y-2 gap-x-2">
+            <!-- Brand Logo + Compact Network Pill -->
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink-0">
+                <div onclick="switchTab('lobby')" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group shrink-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-neonPink to-neonCyan flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition shrink-0">
+                        <i class="fa-solid fa-gamepad text-white text-sm sm:text-xl"></i>
+                    </div>
                     <span class="font-arcade font-black text-sm sm:text-2xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-neonCyan via-white to-neonPink">
                         NEON<span class="text-neonPink">ARCADE</span>
                     </span>
-                    <span class="hidden md:inline-block ml-2 text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
-                        Free-to-Play
-                    </span>
-                    <span id="network-status-pill" onclick="flushOfflineSyncQueue(true)" class="inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer" title="Tap to force sync offline scores">
-                        <span id="network-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        <span id="network-status-text">Online</span>
-                    </span>
                 </div>
+                <span id="network-status-pill" onclick="flushOfflineSyncQueue(true)" class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer shrink-0" title="Tap to force sync offline scores">
+                    <span id="network-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span id="network-status-text">Online</span>
+                </span>
             </div>
 
-            <!-- Navigation Links -->
-            <nav class="flex items-center gap-1 sm:gap-2 shrink-0">
-                <button onclick="switchTab('lobby')" id="nav-lobby" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold transition flex items-center gap-1.5 bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
-                    <i class="fa-solid fa-grip"></i>
-                    <span class="hidden xs:inline sm:inline">Lobby</span>
-                </button>
-                <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-trophy text-amber-400"></i>
-                    <span class="hidden md:inline">High Scores</span>
-                </button>
-                <button onclick="switchTab('admin')" id="nav-admin" class="hidden px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-screwdriver-wrench text-neonPink"></i>
-                    <span class="hidden sm:inline">Admin</span>
-                </button>
-                <button onclick="switchTab('guide')" id="nav-guide" class="hidden px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-question text-emerald-400"></i>
-                    <span class="hidden lg:inline">How to Add Games</span>
-                </button>
-                <button onclick="openWebInstallerModal()" id="nav-install-app" class="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-sm font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1.5" title="Install App on Android or iPhone">
-                    <i class="fa-solid fa-mobile-screen-button text-emerald-400"></i>
-                    <span class="hidden sm:inline">Install App</span>
-                </button>
-            </nav>
+            <!-- Right Controls: Navigation Links + User Auth Status Area (Never Overflows Mobile Screen) -->
+            <div class="flex items-center justify-end gap-1 sm:gap-2 ml-auto flex-wrap">
+                <nav class="flex items-center gap-1 sm:gap-1.5">
+                    <button onclick="switchTab('lobby')" id="nav-lobby" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-semibold transition flex items-center gap-1 bg-cyan-500/20 text-neonCyan border border-cyan-500/40">
+                        <i class="fa-solid fa-grip"></i>
+                        <span class="hidden sm:inline">Lobby</span>
+                    </button>
+                    <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1">
+                        <i class="fa-solid fa-trophy text-amber-400"></i>
+                        <span class="hidden md:inline">High Scores</span>
+                    </button>
+                    <button onclick="switchTab('admin')" id="nav-admin" class="hidden px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1">
+                        <i class="fa-solid fa-screwdriver-wrench text-neonPink"></i>
+                        <span class="hidden sm:inline">Admin</span>
+                    </button>
+                    <button onclick="switchTab('guide')" id="nav-guide" class="hidden px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1">
+                        <i class="fa-solid fa-circle-question text-emerald-400"></i>
+                        <span class="hidden lg:inline">Guide</span>
+                    </button>
+                    <button onclick="openWebInstallerModal()" id="nav-install-app" class="px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-sm font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1" title="Install App on Android or iPhone">
+                        <i class="fa-solid fa-mobile-screen-button text-emerald-400"></i>
+                        <span class="hidden sm:inline">Install App</span>
+                    </button>
+                </nav>
 
-            <!-- User Auth Status Area -->
-            <div id="user-nav-area" class="flex items-center gap-1.5 shrink-0">
-                <!-- Populated dynamically via JS -->
+                <!-- User Auth Status Area -->
+                <div id="user-nav-area" class="flex items-center gap-1 shrink-0">
+                    <!-- Populated dynamically via JS -->
+                </div>
             </div>
         </div>
     </header>
@@ -306,7 +305,7 @@
                         </div>
                     </div>
 
-                    <!-- Mobile Quick Pause & Restart -->
+                    <!-- Mobile Quick Pause & New Game -->
                     <div class="flex sm:hidden items-center gap-1.5 shrink-0">
                         <button onclick="toggleGameFullscreen()" id="mobile-fs-btn" class="px-2 py-1.5 rounded-lg bg-cyan-500/20 border border-cyan-500/50 text-neonCyan text-[11px] font-arcade font-bold" title="Full Screen Mode">
                             <i class="fa-solid fa-expand" id="mobile-fs-icon"></i>
@@ -317,8 +316,8 @@
                         <button onclick="togglePauseGame()" class="px-2.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-[11px] font-arcade font-bold flex items-center gap-1">
                             <i class="fa-solid fa-pause"></i>
                         </button>
-                        <button onclick="restartCurrentGame()" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-neonPink to-purple-600 text-white text-[11px] font-arcade font-bold">
-                            <i class="fa-solid fa-rotate-right"></i>
+                        <button onclick="startNewGame()" class="px-2 py-1.5 rounded-lg bg-gradient-to-r from-neonPink to-purple-600 text-white text-[10px] font-arcade font-bold flex items-center gap-1" title="Start New Game from Stage 1">
+                            <i class="fa-solid fa-rotate-right"></i> <span>New</span>
                         </button>
                     </div>
                 </div>
@@ -348,12 +347,7 @@
                         <div class="flex items-center gap-1" id="speed-control-group">
                             <button onclick="setGameSpeed(0.35)" data-speed="0.35" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-emerald-500 text-slate-950 transition">0.35x</button>
                             <button onclick="setGameSpeed(0.5)" data-speed="0.5" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.5x</button>
-                            <button onclick="setGameSpeed(0.75)" data-speed="0.75" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.75x</button>
-                            <button onclick="setGameSpeed(1)" data-speed="1" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">1x</button>
-                        </div>
-                    </div>
-
-                    <!-- Desktop Pause & Restart -->
+                    <!-- Desktop Pause & New Game -->
                     <div class="hidden sm:flex items-center gap-2">
                         <button onclick="toggleGameFullscreen()" id="arena-fs-btn" class="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 text-neonCyan text-xs font-arcade font-bold transition flex items-center gap-1.5" title="Full Screen Mode (F)">
                             <i class="fa-solid fa-expand" id="arena-fs-icon"></i>
@@ -367,8 +361,8 @@
                             <i class="fa-solid fa-pause" id="arena-pause-icon"></i>
                             <span id="arena-pause-text">Pause</span>
                         </button>
-                        <button onclick="restartCurrentGame()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-neonPink to-purple-600 hover:opacity-90 text-white text-xs font-arcade font-bold transition shadow-lg shadow-pink-500/20">
-                            <i class="fa-solid fa-rotate-right mr-1"></i> Restart
+                        <button onclick="startNewGame()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-neonPink to-purple-600 hover:opacity-90 text-white text-xs font-arcade font-bold transition shadow-lg shadow-pink-500/20" title="Reset saved stage and start a fresh New Game">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> New Game
                         </button>
                     </div>
                 </div>
@@ -378,19 +372,19 @@
             <div id="game-stage-container" class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start relative">
                 <!-- Floating Top HUD Bar shown while in Fullscreen Mode (PC & Mobile) -->
                 <div id="fs-floating-hud" class="hidden col-span-full w-full flex items-center justify-between bg-slate-950/90 border border-cyan-500/40 px-3 py-1.5 rounded-xl shrink-0">
-                    <div class="flex items-center gap-3">
-                        <span id="fs-hud-title" class="font-arcade font-bold text-xs sm:text-sm text-white truncate max-w-[140px] sm:max-w-xs">ARCADE</span>
-                        <span class="font-arcade text-xs text-neonCyan">SCORE: <strong id="fs-hud-score">0</strong></span>
+                    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                        <span id="fs-hud-title" class="font-arcade font-bold text-xs sm:text-sm text-white truncate max-w-[115px] sm:max-w-xs">ARCADE</span>
+                        <span class="font-arcade text-xs text-neonCyan shrink-0">SCORE: <strong id="fs-hud-score">0</strong></span>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="togglePauseGame()" class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-arcade font-bold text-[10px]">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="togglePauseGame()" class="px-2 py-1 rounded-lg bg-amber-500 text-slate-950 font-arcade font-bold text-[10px]">
                             <i class="fa-solid fa-pause"></i> Pause
                         </button>
-                        <button onclick="restartCurrentGame()" class="px-2.5 py-1 rounded-lg bg-neonPink text-white font-arcade font-bold text-[10px]">
-                            <i class="fa-solid fa-rotate-right"></i>
+                        <button onclick="startNewGame()" class="px-2 py-1 rounded-lg bg-neonPink text-white font-arcade font-bold text-[10px]">
+                            <i class="fa-solid fa-rotate-right"></i> New Game
                         </button>
-                        <button onclick="toggleGameFullscreen()" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-cyan-500/50 text-neonCyan font-arcade font-bold text-[10px] flex items-center gap-1">
-                            <i class="fa-solid fa-compress"></i> Exit Full
+                        <button onclick="toggleGameFullscreen()" class="px-2 py-1 rounded-lg bg-slate-800 border border-cyan-500/50 text-neonCyan font-arcade font-bold text-[10px] flex items-center gap-1">
+                            <i class="fa-solid fa-compress"></i> Exit
                         </button>
                     </div>
                 </div>
@@ -408,13 +402,13 @@
                                 <i class="fa-solid fa-pause"></i>
                             </div>
                             <h3 class="font-arcade font-black text-xl sm:text-3xl text-white mb-1">GAME PAUSED</h3>
-                            <p class="text-slate-300 text-xs mb-4">Tap Resume or press 'P' to continue playing.</p>
+                            <p class="text-slate-300 text-xs mb-4">Your current stage is auto-saved! Tap Resume or New Game.</p>
                             <div class="flex flex-wrap items-center justify-center gap-2">
                                 <button onclick="togglePauseGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-neonCyan text-slate-950 font-arcade font-black text-xs sm:text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-cyan-500/30">
                                     <i class="fa-solid fa-play mr-1"></i> Resume
                                 </button>
-                                <button onclick="restartCurrentGame()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-arcade font-bold text-xs uppercase tracking-wider border border-slate-700 transition">
-                                    <i class="fa-solid fa-rotate-right mr-1"></i> Restart
+                                <button onclick="startNewGame()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-arcade font-bold text-xs uppercase tracking-wider border border-slate-700 transition">
+                                    <i class="fa-solid fa-rotate-right mr-1"></i> New Game
                                 </button>
                             </div>
                         </div>
@@ -424,9 +418,14 @@
                             <div id="overlay-icon" class="text-4xl sm:text-5xl mb-2">🏆</div>
                             <h3 id="overlay-title" class="font-arcade font-black text-xl sm:text-3xl text-neonCyan mb-1">GAME OVER</h3>
                             <p id="overlay-subtitle" class="text-slate-300 text-xs sm:text-sm mb-4">Final Score: 0</p>
-                            <button onclick="restartCurrentGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-neonCyan to-blue-500 text-slate-950 font-arcade font-black text-xs sm:text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-cyan-500/30">
-                                <i class="fa-solid fa-play mr-1.5"></i> Play Again
-                            </button>
+                            <div class="flex flex-wrap items-center justify-center gap-2.5">
+                                <button onclick="continueSavedGame()" id="overlay-continue-btn" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-neonCyan text-slate-950 font-arcade font-black text-xs sm:text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-cyan-500/30">
+                                    <i class="fa-solid fa-forward-step mr-1.5"></i> Continue Stage
+                                </button>
+                                <button onclick="startNewGame()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-neonPink to-purple-600 text-white font-arcade font-black text-xs sm:text-sm uppercase tracking-wider hover:scale-105 transition shadow-lg shadow-pink-500/30">
+                                    <i class="fa-solid fa-rotate-right mr-1.5"></i> New Game
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -438,7 +437,7 @@
 
                 <!-- Universal Mobile & Desktop Touch Controller + Controls Guide (Controller FIRST on mobile so zero scrolling needed!) -->
                 <div class="lg:col-span-4 bg-[#121225] rounded-2xl border border-slate-800 p-2.5 sm:p-5 space-y-2.5 sm:space-y-4 w-full overflow-hidden">
-                    <!-- Virtual Arcade Controller Pad (Fits All Mobile Screens Cleanly Without Overflow) -->
+                    <!-- Virtual Arcade Controller Pad (Hidden automatically for direct touch/tap games like Bottle Sort & Memory Matrix) -->
                     <div id="virtual-controller" class="bg-[#0b0b18] rounded-2xl p-2.5 sm:p-4 border border-cyan-500/40 flex items-center justify-between gap-2 select-none w-full overflow-hidden">
                         <!-- ENLARGED D-PAD (168px on compact phones, 188px on larger screens) -->
                         <div id="dpad-touch-zone" class="grid grid-cols-3 gap-1.5 w-[168px] h-[168px] xs:w-[178px] xs:h-[178px] sm:w-[190px] sm:h-[190px] shrink-0 touch-none">
@@ -466,19 +465,19 @@
                         <!-- ENLARGED ACTION BUTTONS (Zero Horizontal Overflow on iPhone 15) -->
                         <div class="flex flex-col items-center justify-center gap-2 flex-1 min-w-0">
                             <button id="btn-action" class="dpad-btn w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-neonPink to-rose-700 border-4 border-pink-400 text-white font-arcade font-black shadow-xl shadow-pink-500/40 flex flex-col items-center justify-center active:scale-95 shrink-0">
-                                <span class="text-base sm:text-xl tracking-wide pointer-events-none">FIRE</span>
-                                <span class="text-[9px] sm:text-[10px] opacity-90 pointer-events-none">ACTION</span>
+                    <!-- Direct Touch Bar (Shown instead of D-Pad for Bottle Sort, Memory Matrix & Whack-a-Bot) -->
+                    <div id="touch-only-controls-bar" class="hidden bg-[#0b0b18] rounded-2xl p-3 border border-cyan-500/40 flex items-center justify-between gap-2 select-none w-full">
+                        <div class="flex items-center gap-2 text-xs text-neonCyan font-arcade">
+                            <i class="fa-solid fa-hand-pointer text-base animate-bounce"></i>
+                            <span>Tap Directly on Game Screen</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button onclick="startNewGame()" class="px-2.5 py-1.5 rounded-xl bg-neonPink/20 border border-neonPink/50 text-neonPink font-arcade font-bold text-[10px] uppercase">
+                                <i class="fa-solid fa-rotate-right mr-1"></i>New Game
                             </button>
-                            <div class="grid grid-cols-2 gap-1.5 w-full max-w-[148px]">
-                                <button onclick="togglePauseGame()" id="mobile-pause-btn" class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-amber-400 font-arcade font-bold text-[10px] uppercase flex items-center justify-center gap-1 transition truncate">
-                                    <i class="fa-solid fa-pause" id="mobile-pause-icon"></i>
-                                    <span id="mobile-pause-text">Pause</span>
-                                </button>
-                                <button onclick="toggleGameFullscreen()" class="px-2 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-neonCyan font-arcade font-bold text-[10px] uppercase flex items-center justify-center gap-1 transition truncate">
-                                    <i class="fa-solid fa-expand"></i>
-                                    <span>Full</span>
-                                </button>
-                            </div>
+                            <button onclick="toggleGameFullscreen()" class="px-2.5 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-neonCyan font-arcade font-bold text-[10px] uppercase">
+                                <i class="fa-solid fa-expand mr-1"></i>Full
+                            </button>
                         </div>
                     </div>
 
@@ -991,9 +990,20 @@ if (inputState.action) fireLaser();</pre>
     <!-- ==================== APPLICATION & 10 GAMES ENGINE SCRIPT ==================== -->
     <script>
         /********************************************************************
-         * 1. INITIAL STATE, 10 BUILT-IN GAMES CATALOG & STORAGE MANAGEMENT
+         * 1. INITIAL STATE, 14 BUILT-IN GAMES CATALOG & STORAGE MANAGEMENT
          ********************************************************************/
         const DEFAULT_GAMES = [
+            {
+                id: 'nokia_bounce',
+                title: 'Nokia Bounce (11 Levels)',
+                category: 'Arcade',
+                icon: '🔴',
+                type: 'builtin',
+                gradient: 'from-red-500/25 via-rose-500/20 to-amber-500/20',
+                badgeColor: 'text-rose-400 border-rose-500/40',
+                desc: 'The legendary classic Nokia red ball platformer with all 11 original levels! Roll, bounce, float in water with the big ball, squeeze through tight gaps, dodge yellow spikes, and pass through every golden ring to open the exit!',
+                controls: 'Left / Right to roll, Up / FIRE / Space to jump. Your current level (1–11) is automatically saved!'
+            },
             {
                 id: 'magic_bottle_sort',
                 title: 'Magic Bottle Sort',
@@ -1003,7 +1013,7 @@ if (inputState.action) fireLaser();</pre>
                 gradient: 'from-fuchsia-500/20 via-purple-500/20 to-cyan-500/20',
                 badgeColor: 'text-neonCyan border-cyan-500/40',
                 desc: 'Pour glowing neon liquids between glass bottles until each bottle holds a single pure color! You can only pour onto the same color or into an empty bottle.',
-                controls: 'Tap/Click a bottle to pick it up, then tap another bottle to pour (or use Left/Right + FIRE on Gamepad/Keyboard).'
+                controls: 'Tap/Click a bottle to pick it up, then tap another bottle to pour. Your current level is auto-saved!'
             },
             {
                 id: 'typing_invaders',
@@ -1161,8 +1171,50 @@ if (inputState.action) fireLaser();</pre>
             gameSpeed: 0.35, // Default game speed set to 0.35x
             typingCategory: 'tech', // Default word category for Typing Invaders ('tech', 'animals', 'planets', 'plants', 'all')
             soundMuted: false,
+            savedProgress: {}, // { [gameId]: { stage: number, score: number, extra: any, updatedAt: string } }
             offlineQueue: [] // Pending actions recorded while offline to upload when internet returns
         };
+
+        // Games that use direct screen tap/touch and do not need the Virtual D-Pad
+        const TOUCH_ONLY_NO_DPAD_GAMES = new Set(['magic_bottle_sort', 'memory_matrix', 'whack_a_bot']);
+
+        // Save & Load Per-Game Stage Progress so players can stop and continue from their last stage anytime
+        function getSavedGameProgress(gameId) {
+            if (!gameId) return null;
+            const userKey = (appState.currentUser && appState.currentUser.name) ? appState.currentUser.name.toLowerCase() : 'guest';
+            const compositeKey = `${userKey}__${gameId}`;
+            return (appState.savedProgress && appState.savedProgress[compositeKey]) || null;
+        }
+
+        function saveGameProgress(gameId, stageNum, scoreVal = currentScore, extraData = null) {
+            if (!gameId) return;
+            const userKey = (appState.currentUser && appState.currentUser.name) ? appState.currentUser.name.toLowerCase() : 'guest';
+            const compositeKey = `${userKey}__${gameId}`;
+            if (!appState.savedProgress) appState.savedProgress = {};
+            appState.savedProgress[compositeKey] = {
+                stage: Math.max(1, Number(stageNum) || 1),
+                score: Math.max(0, Number(scoreVal) || 0),
+                extra: extraData,
+                updatedAt: getFormattedDate()
+            };
+            try {
+                window.localStorage.setItem('neon_saved_progress_v1', JSON.stringify(appState.savedProgress));
+            } catch (e) {}
+            persistOfflineSnapshot();
+        }
+
+        function clearSavedGameProgress(gameId) {
+            if (!gameId) return;
+            const userKey = (appState.currentUser && appState.currentUser.name) ? appState.currentUser.name.toLowerCase() : 'guest';
+            const compositeKey = `${userKey}__${gameId}`;
+            if (appState.savedProgress && appState.savedProgress[compositeKey]) {
+                delete appState.savedProgress[compositeKey];
+                try {
+                    window.localStorage.setItem('neon_saved_progress_v1', JSON.stringify(appState.savedProgress));
+                } catch (e) {}
+                persistOfflineSnapshot();
+            }
+        }
 
         /********************************************************************
          * 1A. OFFLINE-FIRST INDEXED-DB CACHE & AUTO-UPLOAD SYNC ENGINE
@@ -1234,6 +1286,9 @@ if (inputState.action) fireLaser();</pre>
                 if (Array.isArray(cachedSnapshot.offlineQueue)) {
                     appState.offlineQueue = cachedSnapshot.offlineQueue;
                 }
+                if (cachedSnapshot.savedProgress && typeof cachedSnapshot.savedProgress === 'object') {
+                    appState.savedProgress = { ...cachedSnapshot.savedProgress, ...appState.savedProgress };
+                }
                 renderUserNav();
                 renderGamesGrid();
                 updateNetworkStatusUI();
@@ -1246,6 +1301,7 @@ if (inputState.action) fireLaser();</pre>
                 users: appState.users,
                 highScores: appState.highScores,
                 scoreHistory: appState.scoreHistory,
+                savedProgress: appState.savedProgress,
                 offlineQueue: appState.offlineQueue
             });
         }
@@ -1260,17 +1316,17 @@ if (inputState.action) fireLaser();</pre>
             const pendingCount = (appState.offlineQueue || []).length;
 
             if (!isOnline) {
-                pill.className = 'inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-pointer';
+                pill.className = 'inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-pointer shrink-0';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
-                text.textContent = pendingCount > 0 ? `Offline (${pendingCount} Queued)` : 'Offline Mode';
+                text.textContent = pendingCount > 0 ? `Offline (${pendingCount})` : 'Offline';
             } else if (pendingCount > 0) {
-                pill.className = 'inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-neonCyan border border-cyan-500/40 cursor-pointer';
+                pill.className = 'inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-neonCyan border border-cyan-500/40 cursor-pointer shrink-0';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-neonCyan animate-ping';
-                text.textContent = `Syncing (${pendingCount})...`;
+                text.textContent = `Sync (${pendingCount})`;
             } else {
-                pill.className = 'inline-flex items-center gap-1 ml-1 sm:ml-2 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer';
+                pill.className = 'inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-arcade uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer shrink-0';
                 dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
-                text.textContent = 'Online • Synced';
+                text.textContent = 'Online';
             }
         }
 
@@ -1783,10 +1839,12 @@ if (inputState.action) fireLaser();</pre>
                 const savedCurrentUser = window.sessionStorage.getItem('neon_current_user_v1');
                 const savedAdminAuth = window.sessionStorage.getItem('neon_admin_auth_v1');
                 const savedSpeed = window.sessionStorage.getItem('neon_game_speed_v2');
+                const savedProg = window.localStorage.getItem('neon_saved_progress_v1');
 
                 if (savedCurrentUser) appState.currentUser = JSON.parse(savedCurrentUser);
                 if (savedAdminAuth === 'true') appState.isAdminAuthenticated = true;
                 if (savedSpeed) appState.gameSpeed = parseFloat(savedSpeed) || 0.35;
+                if (savedProg) appState.savedProgress = JSON.parse(savedProg) || {};
             } catch (e) {
                 // Fallback to in-memory state silently
             }
@@ -2075,9 +2133,17 @@ if (inputState.action) fireLaser();</pre>
                 const topRec = getTopRecordForGame(game.id);
                 const best = appState.highScores[game.id] || 0;
                 const bestDisplay = topRec ? `${topRec.score} (${topRec.user})` : best;
-                const lockLabel = isLocked ? '<i class="fa-solid fa-lock mr-1"></i> Unlock' : '<i class="fa-solid fa-play mr-1"></i> Play';
+                const savedProg = getSavedGameProgress(game.id);
+                const hasSavedStage = savedProg && savedProg.stage > 1;
+                const lockLabel = isLocked
+                    ? '<i class="fa-solid fa-lock mr-1"></i> Unlock'
+                    : hasSavedStage
+                    ? `<i class="fa-solid fa-forward-step mr-1"></i> Stage ${savedProg.stage}`
+                    : '<i class="fa-solid fa-play mr-1"></i> Play';
                 const btnStyle = isLocked
                     ? 'bg-slate-800 text-neonPink border border-neonPink/40'
+                    : hasSavedStage
+                    ? 'bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/20'
                     : 'bg-neonCyan text-slate-950 shadow-md shadow-cyan-500/20';
 
                 return `
@@ -2085,9 +2151,12 @@ if (inputState.action) fireLaser();</pre>
                         <div>
                             <div class="h-28 bg-gradient-to-br ${game.gradient || 'from-cyan-500/20 to-purple-600/20'} flex items-center justify-between px-5 relative">
                                 <span class="text-5xl drop-shadow">${game.icon || '🎮'}</span>
-                                <span class="text-[10px] font-arcade uppercase px-2.5 py-1 rounded-full bg-slate-950/80 border ${game.badgeColor || 'text-neonCyan border-cyan-500/40'}">
-                                    ${game.category}
-                                </span>
+                                <div class="flex flex-col items-end gap-1">
+                                    <span class="text-[10px] font-arcade uppercase px-2.5 py-1 rounded-full bg-slate-950/80 border ${game.badgeColor || 'text-neonCyan border-cyan-500/40'}">
+                                        ${game.category}
+                                    </span>
+                                    ${hasSavedStage ? `<span class="text-[9px] font-arcade uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Saved: Stage ${savedProg.stage}</span>` : ''}
+                                </div>
                             </div>
                             <div class="p-4 space-y-1.5">
                                 <h3 class="font-arcade font-bold text-base text-white">${game.title}</h3>
@@ -2898,18 +2967,33 @@ if (inputState.action) fireLaser();</pre>
             }
             const topRec = getTopRecordForGame(appState.activeGameId);
             const bestText = topRec ? `${topRec.score} by ${topRec.user} (${topRec.date})` : (appState.highScores[appState.activeGameId] || 0);
+            const savedProg = getSavedGameProgress(appState.activeGameId);
+            const contBtn = document.getElementById('overlay-continue-btn');
+            if (contBtn) {
+                if (savedProg && savedProg.stage > 1) {
+                    contBtn.classList.remove('hidden');
+                    contBtn.innerHTML = `<i class="fa-solid fa-forward-step mr-1.5"></i> Continue Stage ${savedProg.stage}`;
+                } else {
+                    contBtn.classList.add('hidden');
+                }
+            }
             document.getElementById('overlay-icon').textContent = icon;
             document.getElementById('overlay-title').textContent = title;
             document.getElementById('overlay-subtitle').textContent = `Your Score: ${currentScore}  |  All-Time Best: ${bestText}`;
             document.getElementById('canvas-overlay').classList.remove('hidden');
         }
 
-        function launchGame(gameId) {
+        function launchGame(gameId, forceFreshNewGame = false) {
             const game = appState.games.find(g => g.id === gameId);
             if (!game) return;
 
+            if (forceFreshNewGame) {
+                clearSavedGameProgress(gameId);
+            }
+
+            const savedProg = getSavedGameProgress(gameId);
             appState.activeGameId = gameId;
-            currentScore = 0;
+            currentScore = (!forceFreshNewGame && savedProg && savedProg.score) ? savedProg.score : 0;
             isGameOver = false;
             isGamePaused = false;
             stopActiveGameLoop();
@@ -2928,13 +3012,17 @@ if (inputState.action) fireLaser();</pre>
             document.getElementById('arena-game-title').textContent = `${game.icon || '🎮'} ${game.title}`;
             document.getElementById('arena-game-instructions').textContent = game.controls || game.desc;
             document.getElementById('arena-detailed-help').textContent = game.desc;
-            document.getElementById('arena-score').textContent = '0';
+            document.getElementById('arena-score').textContent = String(currentScore);
             document.getElementById('arena-best').textContent = bestScoreVal;
             document.getElementById('canvas-overlay').classList.add('hidden');
             const fsTitle = document.getElementById('fs-hud-title');
             const fsScore = document.getElementById('fs-hud-score');
             if (fsTitle) fsTitle.textContent = `${game.icon || '🎮'} ${game.title}`;
-            if (fsScore) fsScore.textContent = '0';
+            if (fsScore) fsScore.textContent = String(currentScore);
+
+            if (!forceFreshNewGame && savedProg && savedProg.stage > 1) {
+                showToast(`▶️ Resumed saved progress at Stage ${savedProg.stage}! (Tap "New Game" to start from Stage 1)`, 'info');
+            }
 
             // Automatically enter Full Screen mode on Mobile Phones when launching any game
             if (isMobileDevice()) {
@@ -2947,14 +3035,22 @@ if (inputState.action) fireLaser();</pre>
             const customWrapper = document.getElementById('custom-game-wrapper');
             const vController = document.getElementById('virtual-controller');
             const vKeyboard = document.getElementById('virtual-keyboard');
+            const touchOnlyBar = document.getElementById('touch-only-controls-bar');
 
             if (vController && vKeyboard) {
                 if (game.id === 'typing_invaders') {
                     vController.classList.add('hidden');
                     vKeyboard.classList.remove('hidden');
+                    if (touchOnlyBar) touchOnlyBar.classList.add('hidden');
+                } else if (TOUCH_ONLY_NO_DPAD_GAMES.has(game.id)) {
+                    // Hide D-Pad completely on touch-only games like Bottle Sort & Memory Matrix
+                    vController.classList.add('hidden');
+                    vKeyboard.classList.add('hidden');
+                    if (touchOnlyBar) touchOnlyBar.classList.remove('hidden');
                 } else {
                     vController.classList.remove('hidden');
                     vKeyboard.classList.add('hidden');
+                    if (touchOnlyBar) touchOnlyBar.classList.add('hidden');
                 }
             }
 
@@ -2974,8 +3070,24 @@ if (inputState.action) fireLaser();</pre>
             }
         }
 
+        // Starts a brand-new game from Stage 1, clearing any saved stage for the active game
+        function startNewGame() {
+            if (appState.activeGameId) {
+                clearSavedGameProgress(appState.activeGameId);
+                showToast('🔄 Started a fresh New Game from Stage 1!', 'info');
+                launchGame(appState.activeGameId, true);
+            }
+        }
+
+        // Continues from the player's saved stage (or restarts if on Stage 1)
+        function continueSavedGame() {
+            if (appState.activeGameId) {
+                launchGame(appState.activeGameId, false);
+            }
+        }
+
         function restartCurrentGame() {
-            if (appState.activeGameId) launchGame(appState.activeGameId);
+            continueSavedGame();
         }
 
         function closeGameArena() {
@@ -2989,6 +3101,7 @@ if (inputState.action) fireLaser();</pre>
         function startBuiltinGame(id) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             switch (id) {
+                case 'nokia_bounce': initNokiaBounceGame(); break;
                 case 'magic_bottle_sort': initBottleSortGame(); break;
                 case 'typing_invaders': initTypingInvadersGame(); break;
                 case 'cyber_tank': initTankGame(); break;
@@ -3007,6 +3120,522 @@ if (inputState.action) fireLaser();</pre>
         }
 
         /********************************************************************
+         * GAME 0000: NOKIA BOUNCE (CLASSIC RED BALL — ALL 11 ORIGINAL LEVELS)
+         ********************************************************************/
+        function initNokiaBounceGame() {
+            const TILE = 26;
+            const saved = getSavedGameProgress('nokia_bounce');
+            let level = (saved && saved.stage >= 1 && saved.stage <= 11) ? saved.stage : 1;
+            let lives = 3;
+
+            // 11 Distinct Classic Nokia Bounce Levels
+            // Legend:
+            // '#' = Red Brick Wall
+            // 'B' = Blue Rubber Bounce Block (Extra bounce)
+            // 'W' = Deep Water Pool (Big ball floats upward, Small ball sinks)
+            // '^' = Yellow Spike Hazard
+            // 'M' = Moving Spike Spider
+            // 'R' = Golden Ring (Collect all to unlock Exit Gate)
+            // 'C' = Diamond Checkpoint
+            // 'L' = Inflator Pump (Enlarges ball so it floats in water)
+            // 'D' = Deflator Pin (Shrinks ball to fit 1-tile narrow tunnels)
+            // 'G' = Jump Booster (Super jump power)
+            // 'E' = Level Exit Portal
+            const BOUNCE_LEVEL_THEMES = [
+                { num: 1, name: 'Classic Red Bricks', sky: '#bae6fd', brick: '#dc2626' },
+                { num: 2, name: 'Twin Ring Chambers', sky: '#a5f3fc', brick: '#b91c1c' },
+                { num: 3, name: 'Deflator & Narrow Ducts', sky: '#fde68a', brick: '#c2410c' },
+                { num: 4, name: 'Deep Water Aqueduct', sky: '#93c5fd', brick: '#1d4ed8' },
+                { num: 5, name: 'Moving Spike Caverns', sky: '#ddd6fe', brick: '#7e22ce' },
+                { num: 6, name: 'Rubber Trampoline Vault', sky: '#fbcfe8', brick: '#be185d' },
+                { num: 7, name: 'Submerged Buoyancy Maze', sky: '#67e8f9', brick: '#0f766e' },
+                { num: 8, name: 'Gravity Booster Towers', sky: '#fed7aa', brick: '#9a3412' },
+                { num: 9, name: 'Precision Spike Gauntlet', sky: '#e2e8f0', brick: '#334155' },
+                { num: 10, name: 'Fortress of Rings', sky: '#fecaca', brick: '#991b1b' },
+                { num: 11, name: 'Grand Finale Citadel', sky: '#fef08a', brick: '#b45309' }
+            ];
+
+            let mapCols = 96;
+            const mapRows = 15; // 15 * 26 = 390px canvas height
+            let grid = [];
+            let rings = [];
+            let movingSpiders = [];
+            let totalRings = 0;
+            let ringsCollected = 0;
+            let exitPortal = { x: 0, y: 0, open: false };
+            let checkpoint = { x: 65, y: 290, isBig: false };
+            let levelBannerTimer = 95;
+
+            const ball = {
+                x: 65,
+                y: 290,
+                vx: 0,
+                vy: 0,
+                isBig: false,
+                r: 10,
+                onGround: false,
+                jumpBoostTimer: 0,
+                invulnTimer: 0
+            };
+
+            function buildNokiaLevel(lvlNum) {
+                saveGameProgress('nokia_bounce', lvlNum, currentScore);
+                mapCols = 75 + lvlNum * 6;
+                grid = Array.from({ length: mapRows }, () => Array(mapCols).fill('.'));
+                rings = [];
+                movingSpiders = [];
+
+                // Outer Boundaries (Ceiling, Floor & Side Walls)
+                for (let c = 0; c < mapCols; c++) {
+                    grid[0][c] = '#';
+                    grid[mapRows - 1][c] = '#';
+                    grid[mapRows - 2][c] = '#';
+                }
+                for (let r = 0; r < mapRows; r++) {
+                    grid[r][0] = '#';
+                    grid[r][1] = '#';
+                    grid[r][mapCols - 1] = '#';
+                    grid[r][mapCols - 2] = '#';
+                }
+
+                // Deterministically construct each of the 11 Nokia Bounce levels with signature mechanics
+                for (let section = 1; section < Math.floor((mapCols - 12) / 12); section++) {
+                    const sc = section * 12;
+
+                    // Stepped Brick Platforms & Ring Hoops
+                    const platRow = 10 - (section % 3) * 2;
+                    for (let k = 0; k < 5; k++) {
+                        grid[platRow][sc + k] = (lvlNum >= 6 && section % 2 === 0 && k === 2) ? 'B' : '#';
+                    }
+                    rings.push({ x: (sc + 2.5) * TILE, y: (platRow - 1.5) * TILE, collected: false });
+
+                    // Floor Hazards & Mechanics based on Level Number
+                    if (lvlNum >= 3 && section === 2) {
+                        // Narrow 1-tile tunnel that requires the Deflator ('D') or small ball
+                        grid[12][sc - 2] = 'D';
+                        for (let r = 4; r <= 11; r++) grid[r][sc + 5] = '#';
+                        // Leave row 12 open (1 tile high) so only small ball can roll through
+                    }
+
+                    if ((lvlNum === 4 || lvlNum === 7 || lvlNum >= 9) && section % 3 === 1) {
+                        // Deep Water Basin + Inflator ('L') to float to high rings
+                        grid[12][sc - 1] = 'L';
+                        for (let w = 0; w < 6; w++) {
+                            grid[13][sc + w] = 'W';
+                            grid[12][sc + w] = 'W';
+                            grid[11][sc + w] = 'W';
+                        }
+                        rings.push({ x: (sc + 3) * TILE, y: 4 * TILE, collected: false });
+                    } else if (section % 2 === 1) {
+                        // Yellow Floor Spikes
+                        grid[12][sc + 1] = '^';
+                        if (lvlNum >= 2) grid[12][sc + 3] = '^';
+                    }
+
+                    // Moving Spike Spiders (Levels 5..11)
+                    if (lvlNum >= 5 && section % 2 === 0) {
+                        movingSpiders.push({
+                            x: (sc + 6) * TILE,
+                            y: 9 * TILE,
+                            minY: 4 * TILE,
+                            maxY: 11.5 * TILE,
+                            vy: 1.5 + lvlNum * 0.1
+                        });
+                    }
+
+                    // Jump Booster ('G') on high tower levels
+                    if (lvlNum >= 8 && section === 3) {
+                        grid[12][sc - 1] = 'G';
+                        for (let k = 0; k < 4; k++) grid[4][sc + k] = '#';
+                        rings.push({ x: (sc + 2) * TILE, y: 2.5 * TILE, collected: false });
+                    }
+
+                    // Mid-level Checkpoint Diamond
+                    if (section === Math.floor((mapCols - 12) / 24)) {
+                        grid[platRow - 1][sc + 1] = 'C';
+                    }
+                }
+
+                // Final Ring & Level Exit Portal at the right end of the stage
+                rings.push({ x: (mapCols - 9) * TILE, y: 10 * TILE, collected: false });
+                exitPortal = {
+                    x: (mapCols - 5) * TILE,
+                    y: 11 * TILE,
+                    open: false
+                };
+
+                totalRings = rings.length;
+                ringsCollected = 0;
+
+                // Spawn Ball at Left Start
+                checkpoint = { x: 4 * TILE, y: 11 * TILE, isBig: false };
+                respawnAtCheckpoint();
+                levelBannerTimer = 95;
+            }
+
+            function respawnAtCheckpoint() {
+                ball.x = checkpoint.x;
+                ball.y = checkpoint.y;
+                ball.vx = 0;
+                ball.vy = 0;
+                ball.isBig = checkpoint.isBig;
+                ball.r = ball.isBig ? 14 : 9.5;
+                ball.jumpBoostTimer = 0;
+                ball.invulnTimer = 45;
+            }
+
+            function loseLife() {
+                if (ball.invulnTimer > 0) return;
+                lives--;
+                playArcadeSound('explosion');
+                triggerGamepadVibration(240, 0.85, 1.0);
+                if (lives <= 0) {
+                    triggerGameOver(`POPPED ON LEVEL ${level}!`, '🔴');
+                } else {
+                    showToast(`💥 Ball Popped! Respawning at checkpoint (${lives} lives left)`, 'error');
+                    respawnAtCheckpoint();
+                }
+            }
+
+            function isSolidTile(r, c) {
+                if (r < 0 || r >= mapRows || c < 0 || c >= mapCols) return true;
+                const t = grid[r][c];
+                return t === '#' || t === 'B';
+            }
+
+            function isWaterTile(r, c) {
+                if (r < 0 || r >= mapRows || c < 0 || c >= mapCols) return false;
+                return grid[r][c] === 'W';
+            }
+
+            buildNokiaLevel(level);
+
+            function loop() {
+                if (isGameOver) return;
+                if (isGamePaused) {
+                    activeLoopId = requestAnimationFrame(loop);
+                    return;
+                }
+
+                const spd = Math.max(0.55, appState.gameSpeed * 1.45);
+                if (levelBannerTimer > 0) levelBannerTimer -= spd;
+                if (ball.invulnTimer > 0) ball.invulnTimer -= spd;
+                if (ball.jumpBoostTimer > 0) ball.jumpBoostTimer -= spd;
+
+                ball.r = ball.isBig ? 13.5 : 9.5;
+
+                // Horizontal Roll Control
+                const accel = 0.42 * spd;
+                const maxVx = 4.2;
+                if (inputState.left) ball.vx = Math.max(-maxVx, ball.vx - accel);
+                else if (inputState.right) ball.vx = Math.min(maxVx, ball.vx + accel);
+                else ball.vx *= 0.84;
+
+                // Check if Ball is inside Water ('W')
+                const centerCol = Math.floor(ball.x / TILE);
+                const centerRow = Math.floor(ball.y / TILE);
+                const inWater = isWaterTile(centerRow, centerCol);
+
+                // Gravity vs Big Ball Water Buoyancy
+                if (inWater && ball.isBig) {
+                    // Big inflated ball floats upward in water!
+                    ball.vy = Math.max(-3.6, ball.vy - 0.34 * spd);
+                } else if (inWater) {
+                    ball.vy = Math.min(3.2, ball.vy + 0.14 * spd);
+                } else {
+                    ball.vy = Math.min(7.5, ball.vy + 0.28 * spd);
+                }
+
+                // Jump Input (Up / Space / FIRE button)
+                const jumpDesired = inputState.up || inputState.action || inputState.justPressedAction;
+                if (jumpDesired && (ball.onGround || (inWater && ball.isBig))) {
+                    const jumpStrength = ball.jumpBoostTimer > 0 ? -8.6 : -6.9;
+                    ball.vy = jumpStrength;
+                    ball.onGround = false;
+                    inputState.justPressedAction = false;
+                    playArcadeSound('bounce');
+                    triggerGamepadVibration(24, 0.25, 0.35);
+                }
+
+                // Horizontal Movement & Tile Collision
+                ball.x += ball.vx * spd;
+                const leftCol = Math.floor((ball.x - ball.r) / TILE);
+                const rightCol = Math.floor((ball.x + ball.r) / TILE);
+                const topRowH = Math.floor((ball.y - ball.r + 3) / TILE);
+                const botRowH = Math.floor((ball.y + ball.r - 3) / TILE);
+
+                if (ball.vx > 0 && (isSolidTile(topRowH, rightCol) || isSolidTile(botRowH, rightCol))) {
+                    ball.x = rightCol * TILE - ball.r - 0.1;
+                    ball.vx = 0;
+                } else if (ball.vx < 0 && (isSolidTile(topRowH, leftCol) || isSolidTile(botRowH, leftCol))) {
+                    ball.x = (leftCol + 1) * TILE + ball.r + 0.1;
+                    ball.vx = 0;
+                }
+
+                // Vertical Movement & Bounce Physics
+                ball.y += ball.vy * spd;
+                ball.onGround = false;
+                const curLeftCol = Math.floor((ball.x - ball.r + 3) / TILE);
+                const curRightCol = Math.floor((ball.x + ball.r - 3) / TILE);
+                const topRowV = Math.floor((ball.y - ball.r) / TILE);
+                const botRowV = Math.floor((ball.y + ball.r) / TILE);
+
+                if (ball.vy > 0 && (isSolidTile(botRowV, curLeftCol) || isSolidTile(botRowV, curRightCol))) {
+                    const hitRubber = grid[botRowV]?.[curLeftCol] === 'B' || grid[botRowV]?.[curRightCol] === 'B';
+                    ball.y = botRowV * TILE - ball.r - 0.1;
+                    if (hitRubber) {
+                        ball.vy = -7.8;
+                        playArcadeSound('bounce');
+                        triggerGamepadVibration(35, 0.4, 0.5);
+                    } else if (ball.vy > 2.4 && !jumpDesired) {
+                        // Signature Nokia Bounce elastic rebound
+                        ball.vy = -ball.vy * 0.42;
+                        ball.onGround = true;
+                    } else {
+                        ball.vy = 0;
+                        ball.onGround = true;
+                    }
+                } else if (ball.vy < 0 && (isSolidTile(topRowV, curLeftCol) || isSolidTile(topRowV, curRightCol))) {
+                    ball.y = (topRowV + 1) * TILE + ball.r + 0.1;
+                    ball.vy = 0;
+                }
+
+                // Special Tile Interactions (Spikes, Inflator, Deflator, Checkpoint, Jump Booster)
+                const tileAtBall = grid[centerRow]?.[centerCol];
+                if (tileAtBall === '^') {
+                    loseLife();
+                    if (isGameOver) return;
+                } else if (tileAtBall === 'L' && !ball.isBig) {
+                    ball.isBig = true;
+                    playArcadeSound('powerup');
+                    triggerGamepadVibration(60, 0.5, 0.7);
+                    showToast('🎈 Ball Inflated! You can now float in deep water!', 'info');
+                } else if (tileAtBall === 'D' && ball.isBig) {
+                    ball.isBig = false;
+                    playArcadeSound('coin');
+                    showToast('📍 Ball Deflated! Squeeze through narrow 1-tile passages!', 'info');
+                } else if (tileAtBall === 'G') {
+                    ball.jumpBoostTimer = 420;
+                    grid[centerRow][centerCol] = '.';
+                    playArcadeSound('powerup');
+                    showToast('⚡ Super Jump Booster Activated!', 'success');
+                } else if (tileAtBall === 'C') {
+                    grid[centerRow][centerCol] = '.';
+                    checkpoint = { x: ball.x, y: ball.y, isBig: ball.isBig };
+                    addScore(50);
+                    playArcadeSound('powerup');
+                    showToast('💎 Checkpoint Saved!', 'success');
+                }
+
+                // Collect Golden Rings
+                rings.forEach(ring => {
+                    if (!ring.collected && Math.hypot(ball.x - ring.x, ball.y - ring.y) < ball.r + 12) {
+                        ring.collected = true;
+                        ringsCollected++;
+                        addScore(100);
+                        playArcadeSound('score');
+                        triggerGamepadVibration(50, 0.4, 0.6);
+                        if (ringsCollected >= totalRings) {
+                            exitPortal.open = true;
+                            playArcadeSound('powerup');
+                            showToast('🚪 All Rings Collected! The Exit Portal is OPEN!', 'success');
+                        }
+                    }
+                });
+
+                // Update Moving Spike Spiders
+                for (let i = 0; i < movingSpiders.length; i++) {
+                    const sp = movingSpiders[i];
+                    sp.y += sp.vy * spd;
+                    if (sp.y < sp.minY || sp.y > sp.maxY) sp.vy *= -1;
+                    if (Math.hypot(ball.x - sp.x, ball.y - sp.y) < ball.r + 10) {
+                        loseLife();
+                        if (isGameOver) return;
+                    }
+                }
+
+                // Check Level Exit Portal
+                if (exitPortal.open && Math.hypot(ball.x - exitPortal.x, ball.y - exitPortal.y) < ball.r + 16) {
+                    addScore(250 + level * 50);
+                    playArcadeSound('powerup');
+                    triggerGamepadVibration(180, 0.8, 1.0);
+                    if (level < 11) {
+                        level++;
+                        saveGameProgress('nokia_bounce', level, currentScore);
+                        showToast(`🎉 LEVEL ${level - 1} COMPLETE! Advancing to Level ${level}/11!`, 'success');
+                        buildNokiaLevel(level);
+                    } else {
+                        saveGameProgress('nokia_bounce', 1, currentScore);
+                        triggerGameOver('ALL 11 NOKIA BOUNCE LEVELS COMPLETED!', '👑');
+                        return;
+                    }
+                }
+
+                // ==================== CAMERA & RENDER ====================
+                const theme = BOUNCE_LEVEL_THEMES[(level - 1) % BOUNCE_LEVEL_THEMES.length];
+                const camX = Math.max(0, Math.min(mapCols * TILE - canvas.width, ball.x - canvas.width * 0.38));
+
+                ctx.fillStyle = theme.sky;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.save();
+                ctx.translate(-camX, 0);
+
+                const startCol = Math.max(0, Math.floor(camX / TILE) - 1);
+                const endCol = Math.min(mapCols - 1, Math.ceil((camX + canvas.width) / TILE) + 1);
+
+                for (let r = 0; r < mapRows; r++) {
+                    for (let c = startCol; c <= endCol; c++) {
+                        const t = grid[r][c];
+                        const tx = c * TILE;
+                        const ty = r * TILE;
+
+                        if (t === '#') {
+                            ctx.fillStyle = theme.brick;
+                            ctx.fillRect(tx, ty, TILE, TILE);
+                            ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(tx, ty, TILE, TILE);
+                            ctx.fillStyle = 'rgba(255,255,255,0.22)';
+                            ctx.fillRect(tx + 2, ty + 2, TILE - 4, 4);
+                        } else if (t === 'B') {
+                            ctx.fillStyle = '#0284c7';
+                            ctx.fillRect(tx, ty, TILE, TILE);
+                            ctx.strokeStyle = '#38bdf8';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(tx + 1, ty + 1, TILE - 2, TILE - 2);
+                        } else if (t === 'W') {
+                            ctx.fillStyle = 'rgba(37, 99, 235, 0.52)';
+                            ctx.fillRect(tx, ty, TILE, TILE);
+                        } else if (t === '^') {
+                            ctx.fillStyle = '#facc15';
+                            ctx.strokeStyle = '#854d0e';
+                            ctx.lineWidth = 1.5;
+                            ctx.beginPath();
+                            ctx.moveTo(tx + 3, ty + TILE);
+                            ctx.lineTo(tx + TILE / 2, ty + 4);
+                            ctx.lineTo(tx + TILE - 3, ty + TILE);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.stroke();
+                        } else if (t === 'L' || t === 'D') {
+                            ctx.fillStyle = t === 'L' ? '#22c55e' : '#f97316';
+                            ctx.beginPath();
+                            ctx.arc(tx + TILE / 2, ty + TILE / 2, 8, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.fillStyle = '#ffffff';
+                            ctx.font = 'bold 9px Orbitron, sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(t === 'L' ? '+' : '-', tx + TILE / 2, ty + TILE / 2 + 3);
+                            ctx.textAlign = 'start';
+                        } else if (t === 'G') {
+                            ctx.fillStyle = '#a855f7';
+                            ctx.fillRect(tx + 4, ty + 4, TILE - 8, TILE - 8);
+                        } else if (t === 'C') {
+                            ctx.fillStyle = '#38bdf8';
+                            ctx.beginPath();
+                            ctx.moveTo(tx + TILE / 2, ty + 3);
+                            ctx.lineTo(tx + TILE - 3, ty + TILE / 2);
+                            ctx.lineTo(tx + TILE / 2, ty + TILE - 3);
+                            ctx.lineTo(tx + 3, ty + TILE / 2);
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+                    }
+                }
+
+                // Draw Golden Rings
+                rings.forEach(ring => {
+                    if (ring.collected) return;
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.ellipse(ring.x, ring.y, 7, 15, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.strokeStyle = '#ca8a04';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                });
+
+                // Draw Moving Spike Spiders
+                movingSpiders.forEach(sp => {
+                    ctx.fillStyle = '#1e293b';
+                    ctx.beginPath();
+                    ctx.arc(sp.x, sp.y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 2.5;
+                    for (let a = 0; a < 8; a++) {
+                        const ang = (a / 8) * Math.PI * 2;
+                        ctx.beginPath();
+                        ctx.moveTo(sp.x, sp.y);
+                        ctx.lineTo(sp.x + Math.cos(ang) * 14, sp.y + Math.sin(ang) * 14);
+                        ctx.stroke();
+                    }
+                });
+
+                // Draw Exit Portal
+                ctx.fillStyle = exitPortal.open ? '#22c55e' : '#64748b';
+                ctx.fillRect(exitPortal.x - 14, exitPortal.y - 26, 28, 38);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(exitPortal.x - 14, exitPortal.y - 26, 28, 38);
+
+                // Draw Classic Nokia Red Ball with Glossy Highlight
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#991b1b';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.65)';
+                ctx.beginPath();
+                ctx.arc(ball.x - ball.r * 0.3, ball.y - ball.r * 0.3, ball.r * 0.28, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+
+                // Top Nokia Bounce HUD Bar
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+                ctx.fillRect(6, 6, canvas.width - 12, 26);
+                ctx.font = 'bold 11px Orbitron, sans-serif';
+                ctx.fillStyle = '#f87171';
+                ctx.fillText(`LEVEL ${level}/11`, 14, 23);
+
+                ctx.fillStyle = '#facc15';
+                ctx.fillText(`RINGS: ${ringsCollected}/${totalRings}`, 125, 23);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(`BALLS: ${'🔴'.repeat(Math.max(0, lives))}`, 255, 23);
+
+                ctx.fillStyle = exitPortal.open ? '#4ade80' : '#38bdf8';
+                ctx.fillText(exitPortal.open ? 'EXIT OPEN!' : (ball.isBig ? 'SIZE: BIG' : 'SIZE: NORMAL'), 395, 23);
+
+                // Level Banner Overlay
+                if (levelBannerTimer > 0) {
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+                    ctx.fillRect(110, 145, 300, 66);
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(110, 145, 300, 66);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 16px Orbitron, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`NOKIA BOUNCE — LEVEL ${level} / 11`, 260, 173);
+                    ctx.fillStyle = '#fde047';
+                    ctx.font = '11px Inter, sans-serif';
+                    ctx.fillText(theme.name + ' (Progress Auto-Saved)', 260, 195);
+                    ctx.textAlign = 'start';
+                }
+
+                activeLoopId = requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        /********************************************************************
          * GAME 000: MAGIC BOTTLE SORT (WATER SORTING PUZZLE)
          ********************************************************************/
         function initBottleSortGame() {
@@ -3022,7 +3651,8 @@ if (inputState.action) fireLaser();</pre>
                 { id: 7, name: 'Orange', fill: '#f97316', top: '#fdba74' }
             ];
 
-            let level = 1;
+            const saved = getSavedGameProgress('magic_bottle_sort');
+            let level = (saved && saved.stage >= 1) ? saved.stage : 1;
             let moves = 0;
             let bottles = []; // Array of arrays (bottom to top color indices)
             let bottleRects = []; // Hitboxes for tap/click & cursor rendering
@@ -3034,6 +3664,7 @@ if (inputState.action) fireLaser();</pre>
             let levelBannerTimer = 70;
 
             function setupLevel(lvl) {
+                saveGameProgress('magic_bottle_sort', lvl, currentScore);
                 const numColors = Math.min(8, 3 + Math.floor((lvl + 1) / 2)); // Level 1: 4 colors, scales up to 8
                 const numEmpty = 2;
                 const totalBottles = numColors + numEmpty;
@@ -3190,6 +3821,7 @@ if (inputState.action) fireLaser();</pre>
                     addScore(150 + level * 25);
                     showToast(`✨ LEVEL ${level} SOLVED! +${150 + level * 25} Bonus!`, 'success');
                     level++;
+                    saveGameProgress('magic_bottle_sort', level, currentScore);
                     setTimeout(() => {
                         if (!isGameOver && appState.activeGameId === 'magic_bottle_sort') {
                             setupLevel(level);
@@ -3505,14 +4137,16 @@ if (inputState.action) fireLaser();</pre>
 
             const WORD_BANKS = getActiveWordBank();
 
-            let wave = 1;
+            const saved = getSavedGameProgress('typing_invaders');
+            let wave = (saved && saved.stage >= 1) ? saved.stage : 1;
             let lives = 3;
             let streak = 0;
             let wordsClearedInWave = 0;
-            let wordsPerWave = 6;
+            let wordsPerWave = 6 + (wave - 1) * 2;
             let spawnTimer = 0;
             let lockedEnemyId = null;
             let nextEnemyId = 1;
+            saveGameProgress('typing_invaders', wave, currentScore);
 
             let enemies = []; // { id, x, y, word, typedIndex, vy, color, isBoss }
             let lasers = [];  // { sx, sy, tx, ty, life, color }
@@ -3636,7 +4270,8 @@ if (inputState.action) fireLaser();</pre>
                                 wordsClearedInWave = 0;
                                 wordsPerWave = 6 + wave * 2;
                                 addScore(100);
-                                showToast(`WAVE ${wave - 1} CLEARED! +100 Bonus!`, 'success');
+                                saveGameProgress('typing_invaders', wave, currentScore);
+                                showToast(`WAVE ${wave - 1} CLEARED! Saved at Wave ${wave}!`, 'success');
                             }
                             if (enemies.length === 0) {
                                 spawnWordInvader();
@@ -3867,9 +4502,11 @@ if (inputState.action) fireLaser();</pre>
          ********************************************************************/
         function initTankGame() {
             const TILE = 26; // 20 cols x 15 rows = 520 x 390
-            let stage = 1;
-            let enemiesRemainingToSpawn = 8;
+            const saved = getSavedGameProgress('cyber_tank');
+            let stage = (saved && saved.stage >= 1) ? saved.stage : 1;
+            let enemiesRemainingToSpawn = 6 + stage * 2;
             let spawnTimer = 0;
+            saveGameProgress('cyber_tank', stage, currentScore);
 
             // Player Tank spawns beside the PC Base
             let player = {
@@ -4206,6 +4843,7 @@ if (inputState.action) fireLaser();</pre>
                 if (enemiesRemainingToSpawn <= 0 && enemies.length === 0) {
                     stage++;
                     addScore(200);
+                    saveGameProgress('cyber_tank', stage, currentScore);
                     enemiesRemainingToSpawn = 6 + stage * 2;
                     stageBannerTimer = 100;
                     buildStageMaze(stage);
@@ -4214,7 +4852,7 @@ if (inputState.action) fireLaser();</pre>
                     player.dir = 'up';
                     player.shieldTimer = 150;
                     spawnEnemy();
-                    showToast(`STAGE ${stage - 1} CLEARED! +200 Bonus!`, 'success');
+                    showToast(`STAGE ${stage - 1} CLEARED! Progress saved at Stage ${stage}!`, 'success');
                 }
 
                 // Update Enemy Tanks (Target Player & PC Base)
