@@ -554,6 +554,34 @@
                         </div>
                     </div>
 
+                    <!-- Speed Adjuster (Shown ONLY for Nokia Bounce Game) -->
+                    <div id="bounce-speed-adjuster" class="hidden bg-[#0b0b18] rounded-2xl p-3 border border-cyan-500/40 space-y-2 select-none w-full">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-arcade font-bold text-neonCyan flex items-center gap-1.5">
+                                <i class="fa-solid fa-gauge-high text-emerald-400"></i> BOUNCE SPEED
+                            </span>
+                            <span id="bounce-speed-label" class="text-[10px] font-arcade font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                                0.85x (Normal)
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5">
+                            <button type="button" onclick="setGameSpeed(0.5)" data-bspd="0.5" class="bounce-spd-btn py-1.5 rounded-lg font-arcade font-bold text-[10px] bg-slate-800 text-slate-300 hover:text-white transition">
+                                0.5x Chill
+                            </button>
+                            <button type="button" onclick="setGameSpeed(0.85)" data-bspd="0.85" class="bounce-spd-btn py-1.5 rounded-lg font-arcade font-bold text-[10px] bg-neonCyan text-slate-950 transition shadow shadow-cyan-500/30">
+                                0.85x Default
+                            </button>
+                            <button type="button" onclick="setGameSpeed(1.1)" data-bspd="1.1" class="bounce-spd-btn py-1.5 rounded-lg font-arcade font-bold text-[10px] bg-slate-800 text-slate-300 hover:text-white transition">
+                                1.1x Fast
+                            </button>
+                            <button type="button" onclick="setGameSpeed(1.35)" data-bspd="1.35" class="bounce-spd-btn py-1.5 rounded-lg font-arcade font-bold text-[10px] bg-slate-800 text-slate-300 hover:text-white transition">
+                                1.35x Turbo
+                            </button>
+                        </div>
+                        <input type="range" id="bounce-speed-slider" min="0.4" max="1.5" step="0.05" value="0.85" oninput="setGameSpeed(this.value)"
+                            class="w-full accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg">
+                    </div>
+
                     <!-- On-Screen Touch QWERTY Keyboard for Typing Invaders (All-Device Mobile & Desktop Support) -->
                     <div id="virtual-keyboard" class="hidden bg-[#0b0b18] rounded-xl p-2.5 sm:p-3 border border-cyan-500/40 select-none space-y-2.5">
                         <!-- Word Category Selector Buttons -->
@@ -2326,7 +2354,26 @@ if (inputState.action) fireLaser();</pre>
         }
 
         function setGameSpeed(speedVal) {
-            appState.gameSpeed = Math.max(0.25, Math.min(1.5, Number(speedVal) || 0.55));
+            const val = Math.max(0.25, Math.min(1.5, Number(speedVal) || 0.85));
+            appState.gameSpeed = val;
+
+            const slider = document.getElementById('bounce-speed-slider');
+            if (slider && Math.abs(Number(slider.value) - val) > 0.01) {
+                slider.value = val;
+            }
+            const label = document.getElementById('bounce-speed-label');
+            if (label) {
+                const tag = val <= 0.6 ? 'Chill' : val <= 0.9 ? 'Normal' : val <= 1.15 ? 'Fast' : 'Turbo';
+                label.textContent = `${val.toFixed(2).replace(/\.00$/, '')}x (${tag})`;
+            }
+            document.querySelectorAll('.bounce-spd-btn').forEach(btn => {
+                const bVal = Number(btn.getAttribute('data-bspd'));
+                if (Math.abs(bVal - val) < 0.03) {
+                    btn.className = 'bounce-spd-btn py-1.5 rounded-lg font-arcade font-bold text-[10px] bg-neonCyan text-slate-950 transition shadow shadow-cyan-500/30';
+                } else {
+                    btn.className = 'bounce-spd-btn py-1.5 rounded-lg font-arcade font-bold text-[10px] bg-slate-800 text-slate-300 hover:text-white transition';
+                }
+            });
         }
 
         function switchTab(tab) {
@@ -3331,18 +3378,18 @@ if (inputState.action) fireLaser();</pre>
             }
 
             const savedProg = getSavedGameProgress(gameId);
-            appState.activeGameId = gameId;
-            currentScore = (!forceFreshNewGame && savedProg && savedProg.score) ? savedProg.score : 0;
-            isGameOver = false;
-            isGamePaused = false;
-            stopActiveGameLoop();
-            updatePauseUI();
-
-            // Fixed balanced game speed per game (Speed Adjuster removed)
+            // Fixed balanced game speed per game (Speed Adjuster enabled ONLY for Nokia Bounce)
             if (gameId === 'neon_snake') {
                 setGameSpeed(1.0);
+            } else if (gameId === 'nokia_bounce') {
+                setGameSpeed(0.85);
             } else {
                 setGameSpeed(0.55);
+            }
+
+            const bounceSpeedBox = document.getElementById('bounce-speed-adjuster');
+            if (bounceSpeedBox) {
+                bounceSpeedBox.classList.toggle('hidden', gameId !== 'nokia_bounce');
             }
 
             // Switch to Arena View
@@ -3739,7 +3786,7 @@ if (inputState.action) fireLaser();</pre>
                     return;
                 }
 
-                const spd = 0.85;
+                const spd = appState.gameSpeed || 0.85;
                 if (levelBannerTimer > 0) levelBannerTimer -= spd;
                 if (ball.invulnTimer > 0) ball.invulnTimer -= spd;
                 if (ball.jumpBoostTimer > 0) ball.jumpBoostTimer -= spd;
@@ -5060,14 +5107,38 @@ if (inputState.action) fireLaser();</pre>
                 return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
             }
 
-            function canTankMoveTo(cx, cy, half) {
+            function canTankMoveTo(cx, cy, half, movingTank = null) {
                 if (cx - half < 6 || cx + half > canvas.width - 6 || cy - half < 6 || cy + half > canvas.height - 6) {
                     return false;
                 }
                 if (pcBase.alive && rectOverlap(cx - half, cy - half, half * 2, half * 2, pcBase.x, pcBase.y, pcBase.w, pcBase.h)) {
                     return false;
                 }
-                return !blocks.some(b => rectOverlap(cx - half, cy - half, half * 2, half * 2, b.x, b.y, b.w, b.h));
+                if (blocks.some(b => rectOverlap(cx - half, cy - half, half * 2, half * 2, b.x, b.y, b.w, b.h))) {
+                    return false;
+                }
+
+                // Tank-vs-Tank Solid Collision: Prevent tanks from driving over or overlapping each other
+                const pad = 2; // Slight buffer so tanks collide cleanly edge-to-edge
+                if (movingTank !== player) {
+                    const pHalf = player.size / 2;
+                    if (rectOverlap(cx - half + pad, cy - half + pad, (half - pad) * 2, (half - pad) * 2,
+                                    player.x - pHalf + pad, player.y - pHalf + pad, (pHalf - pad) * 2, (pHalf - pad) * 2)) {
+                        return false;
+                    }
+                }
+
+                for (let i = 0; i < enemies.length; i++) {
+                    const other = enemies[i];
+                    if (other === movingTank) continue;
+                    const oHalf = other.size / 2;
+                    if (rectOverlap(cx - half + pad, cy - half + pad, (half - pad) * 2, (half - pad) * 2,
+                                    other.x - oHalf + pad, other.y - oHalf + pad, (oHalf - pad) * 2, (oHalf - pad) * 2)) {
+                        return false;
+                    }
+                }
+
+                return true;
             }
 
             function spawnExplosion(x, y, color, count = 12) {
@@ -5107,7 +5178,10 @@ if (inputState.action) fireLaser();</pre>
                     { x: 260, y: 24 },
                     { x: 488, y: 24 }
                 ];
-                const pt = spawnPoints[Math.floor(Math.random() * spawnPoints.length)];
+                // Only pick a spawn point that is not currently occupied by another tank
+                const freeSpawns = spawnPoints.filter(pt => canTankMoveTo(pt.x, pt.y, 11, null));
+                if (freeSpawns.length === 0) return;
+                const pt = freeSpawns[Math.floor(Math.random() * freeSpawns.length)];
                 // Flashing tanks drop power-ups when destroyed!
                 const isFlashing = Math.random() < 0.38;
                 const isHeavy = Math.random() < Math.min(0.45, stage * 0.12);
@@ -5240,7 +5314,7 @@ if (inputState.action) fireLaser();</pre>
                 else if (inputState.left) { player.dir = 'left'; nx -= moveStep; }
                 else if (inputState.right) { player.dir = 'right'; nx += moveStep; }
 
-                if (canTankMoveTo(nx, ny, half)) {
+                if (canTankMoveTo(nx, ny, half, player)) {
                     player.x = nx;
                     player.y = ny;
                 }
@@ -5315,7 +5389,7 @@ if (inputState.action) fireLaser();</pre>
                     const eny = en.y + v.dy * eSpeed;
 
                     en.moveTimer -= spd;
-                    if (canTankMoveTo(enx, eny, eHalf) && en.moveTimer > 0) {
+                    if (canTankMoveTo(enx, eny, eHalf, en) && en.moveTimer > 0) {
                         en.x = enx;
                         en.y = eny;
                     } else {
