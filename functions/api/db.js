@@ -17,7 +17,10 @@ const JSON_HEADERS = {
     'Access-Control-Allow-Headers': 'Content-Type'
 };
 
-// Automatically ensures all 4 SQLite tables and default admin exist in D1
+// Server-side protected destination address (never exposed in client HTML/JS)
+const DEFAULT_FEEDBACK_RECIPIENT = 'duty-unnerve-dares@duck.com';
+
+// Automatically ensures all 6 SQLite tables (including online_presence & user_feedback) exist in D1
 async function ensureSchema(db) {
     await db.batch([
         db.prepare(`CREATE TABLE IF NOT EXISTS admin_accounts (
@@ -56,15 +59,110 @@ async function ensureSchema(db) {
             html_code TEXT,
             description TEXT NOT NULL,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )`),
+        db.prepare(`CREATE TABLE IF NOT EXISTS online_presence (
+            session_id TEXT PRIMARY KEY,
+            username TEXT DEFAULT 'Guest',
+            last_seen INTEGER NOT NULL
+        )`),
+        db.prepare(`CREATE TABLE IF NOT EXISTS user_feedback (
+            id TEXT PRIMARY KEY,
+            player_name TEXT NOT NULL,
+            reply_email TEXT,
+            category TEXT DEFAULT 'General Feedback',
+            rating INTEGER DEFAULT 5,
+            message TEXT NOT NULL,
+            ip_hash TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )`)
     ]);
+}
+
+// Dispatches secure server-side email notification to duty-unnerve-dares@duck.com
+// Supports Resend API (env.RESEND_API_KEY), FormSubmit Server Relay, or MailChannels Worker Relay
+async function sendSecureFeedbackEmail(env, fb) {
+    const targetEmail = (env && env.FEEDBACK_TO_EMAIL) ? env.FEEDBACK_TO_EMAIL : DEFAULT_FEEDBACK_RECIPIENT;
+    const subject = `[NeonArcade Feedback] ${fb.category} (${fb.rating}/5 ★) from ${fb.name}`;
+    const textBody = [
+        `New Player Feedback Received on NeonArcade`,
+        `------------------------------------------`,
+        `Player / GamerTag: ${fb.name}`,
+        `Reply Email: ${fb.email || 'Not provided'}`,
+        `Category: ${fb.category}`,
+        `Rating: ${fb.rating} / 5 Stars`,
+        `Device: ${fb.device || 'Web Browser'}`,
+        `Submitted At: ${fb.createdAt || new Date().toISOString()}`,
+        ``,
+        `Message:`,
+        `${fb.message}`
+    ].join('\n');
+
+    // Method 1: If RESEND_API_KEY is configured in Cloudflare Variables & Secrets
+    if (env && env.RESEND_API_KEY) {
+        try {
+            await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: 'NeonArcade <onboarding@resend.dev>',
+                    to: [targetEmail],
+                    reply_to: fb.email || undefined,
+                    subject,
+                    text: textBody
+                })
+            });
+            return true;
+        } catch (e) {}
+    }
+
+    // Method 2: Zero-Config Encrypted HTTPS Relay via FormSubmit AJAX API + MailChannels fallback
+    try {
+        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(targetEmail)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Origin': 'https://neon-arcade.pages.dev',
+                'Referer': 'https://neon-arcade.pages.dev/'
+            },
+            body: JSON.stringify({
+                _subject: subject,
+                name: fb.name,
+                email: fb.email || 'noreply@neonarcade.io',
+                category: fb.category,
+                rating: `${fb.rating}/5`,
+                message: fb.message,
+                _captcha: 'false',
+                _template: 'table'
+            })
+        });
+    } catch (e) {}
+
+    // Method 3: Cloudflare Workers MailChannels Relay fallback
+    try {
+        await fetch('https://api.mailchannels.net/tx/v1/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                personalizations: [{ to: [{ email: targetEmail, name: 'NeonArcade Admin' }] }],
+                from: { email: 'noreply@neon-arcade.pages.dev', name: 'NeonArcade Security Relay' },
+                subject,
+                content: [{ type: 'text/plain', value: textBody }]
+            })
+        });
+    } catch (e) {}
+
+    return true;
 }
 
 export async function onRequestOptions() {
     return new Response(null, { status: 204, headers: JSON_HEADERS });
 }
 
-// GET /api/db -> Returns all admins, registered players, all-time scores, and custom games
+// GET /api/db -> Updates live player heartbeat & returns admins, players, online count, scores, custom games, and feedback
 export async function onRequestGet(context) {
     const db = getD1Database(context.env);
     if (!db) {
@@ -76,6 +174,25 @@ export async function onRequestGet(context) {
 
     try {
         await ensureSchema(db);
+
+        // Update active user presence heartbeat (considers sessions active within the last 45 seconds as Online)
+        const urlObj = new URL(context.request.url);
+        const sid = (urlObj.searchParams.get('sid') || '').trim().slice(0, 64);
+        const uname = (urlObj.searchParams.get('user') || 'Guest').trim().slice(0, 60);
+        const nowEpochSec = Math.floor(Date.now() / 1000);
+
+        if (sid) {
+            await db.prepare(
+                `INSERT INTO online_presence (session_id, username, last_seen)
+                 VALUES (?1, ?2, ?3)
+                 ON CONFLICT(session_id) DO UPDATE SET username = excluded.username, last_seen = excluded.last_seen`
+            ).bind(sid, uname, nowEpochSec).run();
+        }
+        // Prune stale sessions older than 45 seconds
+        await db.prepare(`DELETE FROM online_presence WHERE last_seen < ?1`).bind(nowEpochSec - 45).run();
+
+        const onlineRes = await db.prepare(`SELECT COUNT(*) AS cnt FROM online_presence`).first();
+        const onlineCount = Math.max(1, Number(onlineRes && onlineRes.cnt) || 1);
 
         const adminsRes = await db.prepare(
             `SELECT id, username, email, password_hash AS pass, role FROM admin_accounts`
@@ -91,6 +208,10 @@ export async function onRequestGet(context) {
 
         const gamesRes = await db.prepare(
             `SELECT id, title, category, icon, source_type AS type, embed_url AS url, html_code AS htmlCode, description AS desc FROM custom_games ORDER BY rowid DESC`
+        ).all();
+
+        const feedbackRes = await db.prepare(
+            `SELECT id, player_name AS name, reply_email AS email, category, rating, message, created_at AS createdAt FROM user_feedback ORDER BY rowid DESC LIMIT 25`
         ).all();
 
         // Group scores by game_id for the frontend
@@ -114,10 +235,12 @@ export async function onRequestGet(context) {
         return new Response(
             JSON.stringify({
                 ok: true,
+                onlineCount,
                 admins: adminsRes.results || [],
                 users: usersRes.results || [],
                 scoreHistory,
-                customGames
+                customGames,
+                feedback: feedbackRes.results || []
             }),
             { status: 200, headers: JSON_HEADERS }
         );
@@ -126,7 +249,7 @@ export async function onRequestGet(context) {
     }
 }
 
-// POST /api/db -> Writes player registrations, admin accounts, high scores, or custom games to Cloudflare D1
+// POST /api/db -> Writes player registrations, admin accounts, high scores, custom games, or user feedback to Cloudflare D1
 export async function onRequestPost(context) {
     const db = getD1Database(context.env);
     if (!db) {
@@ -196,6 +319,42 @@ export async function onRequestPost(context) {
             ).run();
         } else if (action === 'delete_game') {
             await db.prepare(`DELETE FROM custom_games WHERE id = ?1`).bind(payload.id).run();
+        } else if (action === 'submit_feedback') {
+            const cleanName = String(payload.name || 'Anonymous').replace(/[<>]/g, '').trim().slice(0, 60);
+            const cleanEmail = String(payload.email || '').replace(/[<>]/g, '').trim().slice(0, 120);
+            const cleanCat = String(payload.category || 'General Feedback').replace(/[<>]/g, '').trim().slice(0, 40);
+            const cleanRating = Math.min(5, Math.max(1, parseInt(payload.rating, 10) || 5));
+            const cleanMsg = String(payload.message || '').replace(/[<>]/g, '').trim().slice(0, 1000);
+
+            if (cleanMsg.length < 3) {
+                return new Response(JSON.stringify({ error: 'Feedback message too short' }), { status: 400, headers: JSON_HEADERS });
+            }
+
+            const clientIp = context.request.headers.get('CF-Connecting-IP') || 'unknown';
+            await db.prepare(
+                `INSERT INTO user_feedback (id, player_name, reply_email, category, rating, message, ip_hash, created_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)`
+            ).bind(
+                payload.id || ('fb_' + Date.now()),
+                cleanName,
+                cleanEmail,
+                cleanCat,
+                cleanRating,
+                cleanMsg,
+                clientIp.slice(0, 24),
+                payload.createdAt || new Date().toISOString()
+            ).run();
+
+            // Securely dispatch email to duty-unnerve-dares@duck.com from the server
+            await sendSecureFeedbackEmail(context.env, {
+                name: cleanName,
+                email: cleanEmail,
+                category: cleanCat,
+                rating: cleanRating,
+                message: cleanMsg,
+                device: payload.device || 'Web Browser',
+                createdAt: payload.createdAt || new Date().toISOString()
+            });
         } else {
             return new Response(JSON.stringify({ error: 'Unknown action' }), { status: 400, headers: JSON_HEADERS });
         }
