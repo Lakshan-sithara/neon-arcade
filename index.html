@@ -407,17 +407,6 @@
                         </div>
                     </div>
 
-                    <!-- Live Game Speed Selector -->
-                    <div class="bg-slate-900/90 px-2 py-1 rounded-lg border border-emerald-500/40 flex items-center gap-1.5">
-                        <span class="hidden md:inline text-[9px] font-arcade uppercase text-emerald-400">SPEED</span>
-                        <div class="flex items-center gap-1" id="speed-control-group">
-                            <button onclick="setGameSpeed(0.35)" data-speed="0.35" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-emerald-500 text-slate-950 transition">0.35x</button>
-                            <button onclick="setGameSpeed(0.5)" data-speed="0.5" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.5x</button>
-                            <button onclick="setGameSpeed(0.75)" data-speed="0.75" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">0.75x</button>
-                            <button onclick="setGameSpeed(1.0)" data-speed="1.0" class="speed-btn px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition">1x</button>
-                        </div>
-                    </div>
-
                     <!-- Desktop Pause & New Game -->
                     <div class="hidden sm:flex items-center gap-2">
                         <button onclick="toggleGameFullscreen()" id="arena-fs-btn" class="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/50 text-neonCyan text-xs font-arcade font-bold transition flex items-center gap-1.5" title="Full Screen Mode (F)">
@@ -600,24 +589,6 @@
                         </div>
                         <div id="vk-rows" class="space-y-1.5">
                             <!-- Populated dynamically with QWERTY rows -->
-                        </div>
-                    </div>
-
-                    <!-- Fine-Grained Speed Slider Card -->
-                    <div class="fs-hide-mobile bg-slate-900/80 rounded-xl p-3 border border-emerald-500/30 space-y-1.5">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="font-arcade font-bold text-emerald-400 flex items-center gap-1.5 text-[11px]">
-                                <i class="fa-solid fa-gauge-high"></i> SPEED ADJUSTER
-                            </span>
-                            <span id="speed-slider-label" class="font-arcade font-bold text-[11px] text-white bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40">0.35x (Default)</span>
-                        </div>
-                        <input type="range" id="speed-range-slider" min="0.25" max="1.5" step="0.05" value="0.35"
-                            oninput="setGameSpeed(parseFloat(this.value))"
-                            class="w-full accent-emerald-400 cursor-pointer h-2 bg-slate-800 rounded-lg">
-                        <div class="flex justify-between text-[10px] text-slate-400 font-medium">
-                            <span>🐢 0.35x Default</span>
-                            <span>⚖️ 0.75x Medium</span>
-                            <span>⚡ 1.5x Fast</span>
                         </div>
                     </div>
 
@@ -1080,12 +1051,12 @@ if (inputState.action) fireLaser();</pre>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] font-semibold uppercase text-slate-300 mb-1">Your Name / GamerTag *</label>
-                        <input type="text" id="fb-name" required maxlength="60" placeholder="e.g. Test01"
-                            class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs sm:text-sm text-white focus:outline-none focus:border-neonCyan">
+                        <input type="text" id="fb-name" required maxlength="60" readonly
+                            class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-cyan-500/40 text-xs sm:text-sm text-neonCyan font-arcade font-bold focus:outline-none cursor-not-allowed">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase text-slate-300 mb-1">Reply Email (Optional)</label>
-                        <input type="email" id="fb-email" maxlength="120" placeholder="you@example.com"
+                        <label class="block text-[11px] font-semibold uppercase text-slate-300 mb-1">Account Email *</label>
+                        <input type="email" id="fb-email" required maxlength="120"
                             class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs sm:text-sm text-white focus:outline-none focus:border-neonCyan">
                     </div>
                 </div>
@@ -1142,7 +1113,7 @@ if (inputState.action) fireLaser();</pre>
                     <span>— Play 14+ Responsive Browser Games on Desktop, Tablet & Mobile</span>
                 </div>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-neonCyan font-arcade text-[10px] tracking-wider">
-                    <i class="fa-solid fa-code-branch text-[9px]"></i> Release v3.9.0 (Fixed D-Pad & Live Presence Build)
+                    <i class="fa-solid fa-code-branch text-[9px]"></i> Release v4.0.0 (Dungeon Exploration & Gmail Feedback Build)
                 </span>
             </div>
             <div class="flex flex-wrap items-center justify-center gap-4">
@@ -1339,8 +1310,9 @@ if (inputState.action) fireLaser();</pre>
             selectedCategory: 'All',
             authMode: 'register',
             pendingGameId: null,
+            pendingFeedbackOpen: false,
             activeGameId: null,
-            gameSpeed: 0.35, // Default game speed set to 0.35x
+            gameSpeed: 0.55, // Balanced fixed arcade speed (Speed Adjuster removed)
             typingCategory: 'tech', // Default word category for Typing Invaders ('tech', 'animals', 'planets', 'plants', 'all')
             soundMuted: false,
             savedProgress: {}, // { [gameId]: { stage: number, score: number, extra: any, updatedAt: string } }
@@ -1378,18 +1350,31 @@ if (inputState.action) fireLaser();</pre>
         }
 
         /********************************************************************
-         * 1A-2. SECURE USER FEEDBACK POPUP & ENCRYPTED BACKEND RELAY
+         * 1A-2. SECURE USER FEEDBACK POPUP & GMAIL DELIVERY RELAY
          ********************************************************************/
+        const FEEDBACK_DESTINATION_EMAIL = 'lakshansitharaabeysinghe@gmail.com';
+
         function openFeedbackModal() {
+            // Require user login before opening the User Feedback modal
+            if (!appState.currentUser) {
+                appState.pendingFeedbackOpen = true;
+                showToast('🔒 Please log in or register an account to send player feedback!', 'info');
+                openAuthModal('login');
+                return;
+            }
+
             const modal = document.getElementById('feedback-modal');
             if (!modal) return;
             const nameInput = document.getElementById('fb-name');
             const emailInput = document.getElementById('fb-email');
-            if (appState.currentUser) {
-                if (nameInput && !nameInput.value) nameInput.value = appState.currentUser.name || '';
-                if (emailInput && !emailInput.value && appState.currentUser.email && appState.currentUser.email.includes('@')) {
-                    emailInput.value = appState.currentUser.email;
-                }
+
+            // Automatically fill blank fields with the logged-in user's account data
+            if (nameInput) {
+                nameInput.value = appState.currentUser.name || '';
+            }
+            if (emailInput) {
+                const userEmail = appState.currentUser.email || '';
+                emailInput.value = userEmail.includes('@') ? userEmail : `${appState.currentUser.name || 'player'}@neonarcade.io`;
             }
             modal.classList.remove('hidden');
         }
@@ -1406,8 +1391,44 @@ if (inputState.action) fireLaser();</pre>
                 .slice(0, maxLen);
         }
 
+        async function dispatchDirectGmailFeedback(feedbackPayload) {
+            // Browser-originated HTTPS POST to FormSubmit AJAX endpoint (delivers directly to lakshansitharaabeysinghe@gmail.com)
+            try {
+                const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(FEEDBACK_DESTINATION_EMAIL)}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        _subject: `[NeonArcade Feedback] ${feedbackPayload.category} (${feedbackPayload.rating}/5 ★) from ${feedbackPayload.name}`,
+                        Player_GamerTag: feedbackPayload.name,
+                        Account_Email: feedbackPayload.email,
+                        Category: feedbackPayload.category,
+                        Star_Rating: `${feedbackPayload.rating} / 5`,
+                        Device: feedbackPayload.device,
+                        Message: feedbackPayload.message,
+                        Submitted_At: feedbackPayload.createdAt,
+                        _captcha: 'false',
+                        _template: 'table'
+                    })
+                });
+                return res.ok;
+            } catch (err) {
+                return false;
+            }
+        }
+
         async function handleFeedbackSubmit(e) {
             e.preventDefault();
+
+            if (!appState.currentUser) {
+                closeFeedbackModal();
+                appState.pendingFeedbackOpen = true;
+                showToast('🔒 Please log in first to submit feedback.', 'error');
+                openAuthModal('login');
+                return;
+            }
 
             // 1. Check Anti-Bot Honeypot
             const honeypot = document.getElementById('fb-honeypot');
@@ -1424,11 +1445,16 @@ if (inputState.action) fireLaser();</pre>
                 return;
             }
 
-            const name = sanitizeFeedbackInput(document.getElementById('fb-name').value, 60) || 'AnonymousPlayer';
-            const email = sanitizeFeedbackInput(document.getElementById('fb-email').value, 120);
+            const name = sanitizeFeedbackInput(appState.currentUser.name || document.getElementById('fb-name').value, 60);
+            const email = sanitizeFeedbackInput(document.getElementById('fb-email').value || appState.currentUser.email, 120);
             const category = sanitizeFeedbackInput(document.getElementById('fb-category').value, 40) || 'General Feedback';
             const rating = Math.min(5, Math.max(1, parseInt(document.getElementById('fb-rating').value, 10) || 5));
             const message = sanitizeFeedbackInput(document.getElementById('fb-message').value, 1000);
+
+            if (!name || !email) {
+                showToast('Your account name and email are required.', 'error');
+                return;
+            }
 
             if (message.length < 5) {
                 showToast('Please enter at least 5 characters in your feedback message.', 'error');
@@ -1438,7 +1464,7 @@ if (inputState.action) fireLaser();</pre>
             const submitBtn = document.getElementById('fb-submit-btn');
             const submitText = document.getElementById('fb-submit-text');
             if (submitBtn) submitBtn.disabled = true;
-            if (submitText) submitText.textContent = 'Encrypting & Sending...';
+            if (submitText) submitText.textContent = 'Sending to Gmail & DB...';
 
             const feedbackPayload = {
                 id: 'fb_' + Date.now(),
@@ -1447,6 +1473,7 @@ if (inputState.action) fireLaser();</pre>
                 category,
                 rating,
                 message,
+                toEmail: FEEDBACK_DESTINATION_EMAIL,
                 device: isMobileDevice() ? 'Mobile' : 'Desktop',
                 createdAt: new Date().toISOString()
             };
@@ -1457,11 +1484,15 @@ if (inputState.action) fireLaser();</pre>
                     appState.lastFeedbackSentAt = now;
                     showToast('📴 Saved feedback offline! It will be emailed automatically once you are back online.', 'info');
                 } else {
-                    await callD1Api('submit_feedback', feedbackPayload);
+                    // Dispatch both via browser FormSubmit relay and Cloudflare D1 server relay in parallel
+                    await Promise.allSettled([
+                        dispatchDirectGmailFeedback(feedbackPayload),
+                        callD1Api('submit_feedback', feedbackPayload)
+                    ]);
                     appState.lastFeedbackSentAt = now;
                     playArcadeSound('powerup');
                     triggerGamepadVibration(60, 0.5, 0.7);
-                    showToast('✅ Thank you! Your feedback has been securely delivered!', 'success');
+                    showToast('✅ Feedback sent to lakshansitharaabeysinghe@gmail.com!', 'success');
                     await syncFromCloudflareD1();
                 }
                 document.getElementById('fb-message').value = '';
@@ -1469,7 +1500,7 @@ if (inputState.action) fireLaser();</pre>
             } catch (err) {
                 enqueueOfflineAction('submit_feedback', feedbackPayload);
                 appState.lastFeedbackSentAt = now;
-                showToast('✅ Feedback saved and queued for secure delivery!', 'success');
+                showToast('✅ Feedback saved and queued for delivery!', 'success');
                 closeFeedbackModal();
             } finally {
                 if (submitBtn) submitBtn.disabled = false;
@@ -2140,12 +2171,10 @@ if (inputState.action) fireLaser();</pre>
             try {
                 const savedCurrentUser = window.sessionStorage.getItem('neon_current_user_v1');
                 const savedAdminAuth = window.sessionStorage.getItem('neon_admin_auth_v1');
-                const savedSpeed = window.sessionStorage.getItem('neon_game_speed_v2');
                 const savedProg = window.localStorage.getItem('neon_saved_progress_v1');
 
                 if (savedCurrentUser) appState.currentUser = JSON.parse(savedCurrentUser);
                 if (savedAdminAuth === 'true') appState.isAdminAuthenticated = true;
-                if (savedSpeed) appState.gameSpeed = parseFloat(savedSpeed) || 0.35;
                 if (savedProg) appState.savedProgress = JSON.parse(savedProg) || {};
             } catch (e) {
                 // Fallback to in-memory state silently
@@ -2160,7 +2189,6 @@ if (inputState.action) fireLaser();</pre>
                     window.sessionStorage.removeItem('neon_current_user_v1');
                 }
                 window.sessionStorage.setItem('neon_admin_auth_v1', appState.isAdminAuthenticated ? 'true' : 'false');
-                window.sessionStorage.setItem('neon_game_speed_v2', String(appState.gameSpeed));
             } catch (e) {
                 // Ignore storage restriction errors in sandboxed iframes
             }
@@ -2298,27 +2326,7 @@ if (inputState.action) fireLaser();</pre>
         }
 
         function setGameSpeed(speedVal) {
-            const clamped = Math.max(0.25, Math.min(1.5, Number(speedVal) || 0.35));
-            appState.gameSpeed = clamped;
-            saveData();
-
-            const slider = document.getElementById('speed-range-slider');
-            if (slider) slider.value = String(clamped);
-
-            const label = document.getElementById('speed-slider-label');
-            if (label) {
-                const desc = Math.abs(clamped - 0.35) < 0.03 ? 'Default' : clamped <= 0.55 ? 'Chill' : clamped <= 0.8 ? 'Relaxed' : 'Fast';
-                label.textContent = `${clamped}x (${desc})`;
-            }
-
-            document.querySelectorAll('.speed-btn').forEach(btn => {
-                const btnSpeed = parseFloat(btn.getAttribute('data-speed'));
-                if (Math.abs(btnSpeed - clamped) < 0.03) {
-                    btn.className = 'speed-btn px-2 py-0.5 rounded text-[11px] font-arcade font-bold bg-emerald-500 text-slate-950 transition';
-                } else {
-                    btn.className = 'speed-btn px-2 py-0.5 rounded text-[11px] font-arcade font-bold bg-slate-800 text-slate-300 hover:text-white transition';
-                }
-            });
+            appState.gameSpeed = Math.max(0.25, Math.min(1.5, Number(speedVal) || 0.55));
         }
 
         function switchTab(tab) {
@@ -2603,9 +2611,12 @@ if (inputState.action) fireLaser();</pre>
                 renderUserNav();
                 renderGamesGrid();
                 const pending = appState.pendingGameId;
+                const openFb = appState.pendingFeedbackOpen;
+                appState.pendingFeedbackOpen = false;
                 closeAuthModal();
                 showToast(`Account saved to database! Welcome, ${gamerTag}!`, 'success');
-                if (pending) launchGame(pending);
+                if (openFb) openFeedbackModal();
+                else if (pending) launchGame(pending);
             } else {
                 // Player Login Mode - Check Player Accounts Database
                 const foundPlayer = appState.users.find(u =>
@@ -2619,9 +2630,12 @@ if (inputState.action) fireLaser();</pre>
                     renderUserNav();
                     renderGamesGrid();
                     const pending = appState.pendingGameId;
+                    const openFb = appState.pendingFeedbackOpen;
+                    appState.pendingFeedbackOpen = false;
                     closeAuthModal();
                     showToast(`Welcome back, ${foundPlayer.name}!`, 'success');
-                    if (pending) launchGame(pending);
+                    if (openFb) openFeedbackModal();
+                    else if (pending) launchGame(pending);
                     return;
                 }
 
@@ -3324,9 +3338,11 @@ if (inputState.action) fireLaser();</pre>
             stopActiveGameLoop();
             updatePauseUI();
 
-            // Set Neon Snake default speed to 1.0x when launched
+            // Fixed balanced game speed per game (Speed Adjuster removed)
             if (gameId === 'neon_snake') {
                 setGameSpeed(1.0);
+            } else {
+                setGameSpeed(0.55);
             }
 
             // Switch to Arena View
@@ -3450,7 +3466,7 @@ if (inputState.action) fireLaser();</pre>
         }
 
         /********************************************************************
-         * GAME 0000: NOKIA BOUNCE (CLASSIC RED BALL — ALL 11 ORIGINAL LEVELS)
+         * GAME 0000: NOKIA BOUNCE (ALL 11 LEVELS + DEEP DUNGEON EXPLORATION)
          ********************************************************************/
         function initNokiaBounceGame() {
             const TILE = 26;
@@ -3458,35 +3474,36 @@ if (inputState.action) fireLaser();</pre>
             let level = (saved && saved.stage >= 1 && saved.stage <= 11) ? saved.stage : 1;
             let lives = 3;
 
-            // 11 Distinct Classic Nokia Bounce Levels
+            // 11 Distinct Classic Nokia Bounce Levels with Deep Underground Dungeons
             // Legend:
-            // '#' = Red Brick Wall
-            // 'B' = Blue Rubber Bounce Block (Extra bounce)
+            // '#' = Upper Brick Wall
+            // 'D' = Dark Dungeon Stone Brick
+            // 'B' = Blue Rubber Bounce Block (High Rebound)
             // 'W' = Deep Water Pool (Big ball floats upward, Small ball sinks)
             // '^' = Yellow Spike Hazard
             // 'M' = Moving Spike Spider
-            // 'R' = Golden Ring (Collect all to unlock Exit Gate)
+            // 'R' = Golden Ring (Collect ALL Upper + Dungeon Rings to unlock Exit Gate)
             // 'C' = Diamond Checkpoint
             // 'L' = Inflator Pump (Enlarges ball so it floats in water)
-            // 'D' = Deflator Pin (Shrinks ball to fit 1-tile narrow tunnels)
+            // 'S' = Deflator Pin (Shrinks ball to fit 1-tile narrow dungeon tunnels)
             // 'G' = Jump Booster (Super jump power)
             // 'E' = Level Exit Portal
             const BOUNCE_LEVEL_THEMES = [
-                { num: 1, name: 'Classic Red Bricks', sky: '#bae6fd', brick: '#dc2626' },
-                { num: 2, name: 'Twin Ring Chambers', sky: '#a5f3fc', brick: '#b91c1c' },
-                { num: 3, name: 'Deflator & Narrow Ducts', sky: '#fde68a', brick: '#c2410c' },
-                { num: 4, name: 'Deep Water Aqueduct', sky: '#93c5fd', brick: '#1d4ed8' },
-                { num: 5, name: 'Moving Spike Caverns', sky: '#ddd6fe', brick: '#7e22ce' },
-                { num: 6, name: 'Rubber Trampoline Vault', sky: '#fbcfe8', brick: '#be185d' },
-                { num: 7, name: 'Submerged Buoyancy Maze', sky: '#67e8f9', brick: '#0f766e' },
-                { num: 8, name: 'Gravity Booster Towers', sky: '#fed7aa', brick: '#9a3412' },
-                { num: 9, name: 'Precision Spike Gauntlet', sky: '#e2e8f0', brick: '#334155' },
-                { num: 10, name: 'Fortress of Rings', sky: '#fecaca', brick: '#991b1b' },
-                { num: 11, name: 'Grand Finale Citadel', sky: '#fef08a', brick: '#b45309' }
+                { num: 1, name: 'Brick Ruins & Sunken Crypt', sky: '#bae6fd', brick: '#dc2626', dungeonBg: '#1e1b4b', dungeonBrick: '#4338ca' },
+                { num: 2, name: 'Twin Chambers & Catacombs', sky: '#a5f3fc', brick: '#b91c1c', dungeonBg: '#172554', dungeonBrick: '#1d4ed8' },
+                { num: 3, name: 'Narrow Ducts & Underbelly', sky: '#fde68a', brick: '#c2410c', dungeonBg: '#27120b', dungeonBrick: '#9a3412' },
+                { num: 4, name: 'Flooded Aqueduct Dungeon', sky: '#93c5fd', brick: '#1d4ed8', dungeonBg: '#0c2747', dungeonBrick: '#0369a1' },
+                { num: 5, name: 'Spider Caverns & Abyss', sky: '#ddd6fe', brick: '#7e22ce', dungeonBg: '#2e1065', dungeonBrick: '#6d28d9' },
+                { num: 6, name: 'Trampoline Vault & Depths', sky: '#fbcfe8', brick: '#be185d', dungeonBg: '#3b0722', dungeonBrick: '#9d174d' },
+                { num: 7, name: 'Submerged Buoyancy Labyrinth', sky: '#67e8f9', brick: '#0f766e', dungeonBg: '#042f2e', dungeonBrick: '#0d9488' },
+                { num: 8, name: 'Gravity Towers & Deep Mines', sky: '#fed7aa', brick: '#9a3412', dungeonBg: '#291509', dungeonBrick: '#b45309' },
+                { num: 9, name: 'Spike Gauntlet & Dark Prison', sky: '#e2e8f0', brick: '#334155', dungeonBg: '#0f172a', dungeonBrick: '#475569' },
+                { num: 10, name: 'Fortress of Rings & Lava Crypt', sky: '#fecaca', brick: '#991b1b', dungeonBg: '#2b0909', dungeonBrick: '#b91c1c' },
+                { num: 11, name: 'Grand Finale Citadel & Core', sky: '#fef08a', brick: '#b45309', dungeonBg: '#1a1205', dungeonBrick: '#ca8a04' }
             ];
 
-            let mapCols = 96;
-            const mapRows = 15; // 15 * 26 = 390px canvas height
+            let mapCols = 110;
+            const mapRows = 26; // 2-Story World: Rows 0..13 = Surface World, Rows 14..25 = Subterranean Dungeon!
             let grid = [];
             let rings = [];
             let movingSpiders = [];
@@ -3510,130 +3527,161 @@ if (inputState.action) fireLaser();</pre>
 
             function buildNokiaLevel(lvlNum) {
                 saveGameProgress('nokia_bounce', lvlNum, currentScore);
-                mapCols = lvlNum === 1 ? 64 : 72 + lvlNum * 5;
+                // Map length & difficulty scale progressively with each level (Levels 1..11)
+                mapCols = 92 + lvlNum * 12;
                 grid = Array.from({ length: mapRows }, () => Array(mapCols).fill('.'));
                 rings = [];
                 movingSpiders = [];
 
-                // Outer Boundaries (Ceiling, Floor & Side Walls)
+                // 1. Outer World Boundaries + Surface/Dungeon Dividing Floor (Row 13) & Dungeon Floor (Row 24-25)
                 for (let c = 0; c < mapCols; c++) {
-                    grid[0][c] = '#';
-                    grid[mapRows - 1][c] = '#';
-                    grid[mapRows - 2][c] = '#';
+                    grid[0][c] = '#'; // Sky ceiling
+                    grid[13][c] = '#'; // Surface floor / Dungeon ceiling
+                    grid[14][c] = 'D'; // Dungeon ceiling reinforcement
+                    grid[mapRows - 2][c] = 'D'; // Dungeon bottom floor
+                    grid[mapRows - 1][c] = 'D';
                 }
                 for (let r = 0; r < mapRows; r++) {
-                    grid[r][0] = '#';
-                    grid[r][1] = '#';
-                    grid[r][mapCols - 1] = '#';
-                    grid[r][mapCols - 2] = '#';
+                    const wallChar = r >= 14 ? 'D' : '#';
+                    grid[r][0] = wallChar;
+                    grid[r][1] = wallChar;
+                    grid[r][mapCols - 1] = wallChar;
+                    grid[r][mapCols - 2] = wallChar;
                 }
 
-                // LEVEL 1: Smooth, Fun & Welcoming Classic Nokia Tutorial Stage (Zero Impossible Jumps!)
-                if (lvlNum === 1) {
-                    // Easy ground & low-step rings with wide stepping-stone platforms
-                    rings.push({ x: 10 * TILE, y: 11.5 * TILE, collected: false });
+                // 2. Carve Dungeon Entrance & Exit Shafts so players must explore underground dungeons!
+                const numDungeonZones = Math.min(4, 2 + Math.floor(lvlNum / 3));
+                const zoneSpan = Math.floor((mapCols - 24) / numDungeonZones);
 
-                    // Low Step 1 (Row 11 - only 2 tiles above floor!)
-                    for (let k = 15; k <= 20; k++) grid[11][k] = '#';
-                    rings.push({ x: 17.5 * TILE, y: 9.5 * TILE, collected: false });
+                for (let z = 0; z < numDungeonZones; z++) {
+                    const startC = 14 + z * zoneSpan;
+                    const endC = startC + zoneSpan - 6;
+                    const midC = Math.floor((startC + endC) / 2);
 
-                    // Mid Step 2 (Row 9 - reachable from Step 1 or ground)
-                    for (let k = 23; k <= 28; k++) grid[9][k] = '#';
-                    rings.push({ x: 25.5 * TILE, y: 7.5 * TILE, collected: false });
-
-                    // Checkpoint Diamond in the middle of Level 1
-                    grid[12][32] = 'C';
-
-                    // Blue Rubber Bounce Pad to effortlessly launch up to the upper platform
-                    grid[12][36] = 'B';
-                    grid[12][37] = 'B';
-                    for (let k = 39; k <= 45; k++) grid[8][k] = '#';
-                    rings.push({ x: 42 * TILE, y: 6.5 * TILE, collected: false });
-
-                    // Single gentle obstacle with a stepping platform right over it
-                    for (let k = 48; k <= 51; k++) grid[10][k] = '#';
-                    grid[12][50] = '^';
-                    rings.push({ x: 49.5 * TILE, y: 8.5 * TILE, collected: false });
-
-                    // Final Ground Ring right before Exit Gate
-                    rings.push({ x: (mapCols - 9) * TILE, y: 11.5 * TILE, collected: false });
-                    exitPortal = {
-                        x: (mapCols - 5) * TILE,
-                        y: 11 * TILE,
-                        open: false
-                    };
-
-                    totalRings = rings.length;
-                    ringsCollected = 0;
-                    checkpoint = { x: 4 * TILE, y: 11 * TILE, isBig: false };
-                    respawnAtCheckpoint();
-                    levelBannerTimer = 95;
-                    return;
-                }
-
-                // LEVELS 2–11: Progressive Classic Nokia Bounce Stages with Stepping Stones
-                for (let section = 1; section < Math.floor((mapCols - 12) / 12); section++) {
-                    const sc = section * 12;
-
-                    // Always include a low stepping-stone ledge at row 11 so higher platforms are 100% reachable
-                    grid[11][sc - 3] = '#';
-                    grid[11][sc - 2] = 'B';
-
-                    const platRow = 11 - (section % 3); // Rows 11, 10, or 9 (always reachable)
-                    for (let k = 0; k < 5; k++) {
-                        grid[platRow][sc + k] = (lvlNum >= 6 && section % 2 === 0 && k === 2) ? 'B' : '#';
+                    // Carve Vertical Drop Shaft into the Dungeon (4 tiles wide)
+                    for (let c = startC; c < startC + 4; c++) {
+                        grid[13][c] = '.';
+                        grid[14][c] = '.';
                     }
-                    rings.push({ x: (sc + 2.5) * TILE, y: (platRow - 1.4) * TILE, collected: false });
+                    // Stepping platforms inside the drop shaft
+                    grid[17][startC + 1] = 'D';
+                    grid[17][startC + 2] = 'D';
+                    grid[20][startC + 2] = 'D';
+                    grid[20][startC + 3] = 'D';
 
-                    // Floor Hazards & Mechanics based on Level Number
-                    if (lvlNum >= 3 && section === 2) {
-                        // Narrow 1-tile tunnel that requires the Deflator ('D') or small ball
-                        grid[12][sc - 2] = 'D';
-                        for (let r = 5; r <= 11; r++) grid[r][sc + 5] = '#';
+                    // Carve Vertical Ascent Shaft out of the Dungeon (with Blue Bounce Trampolines!)
+                    for (let c = endC - 4; c < endC; c++) {
+                        grid[13][c] = '.';
+                        grid[14][c] = '.';
                     }
+                    grid[23][endC - 3] = 'B';
+                    grid[23][endC - 2] = 'B';
+                    grid[19][endC - 4] = 'B';
+                    grid[19][endC - 3] = 'B';
+                    grid[15][endC - 2] = 'B';
+                    grid[15][endC - 1] = 'B';
 
-                    if ((lvlNum === 4 || lvlNum === 7 || lvlNum >= 9) && section % 3 === 1) {
-                        // Deep Water Basin + Inflator ('L') to float to high rings
-                        grid[12][sc - 1] = 'L';
-                        for (let w = 0; w < 6; w++) {
-                            grid[13][sc + w] = 'W';
-                            grid[12][sc + w] = 'W';
-                            grid[11][sc + w] = 'W';
+                    // Seal Dungeon Zone side walls so each underground chamber feels like a real dungeon room
+                    for (let r = 15; r <= 23; r++) {
+                        if (r < 21) {
+                            grid[r][startC - 2] = 'D';
+                            grid[r][endC + 1] = 'D';
                         }
-                        // Exit step out of water
-                        grid[11][sc + 6] = '#';
-                        rings.push({ x: (sc + 3) * TILE, y: 6 * TILE, collected: false });
-                    } else if (section % 2 === 1) {
-                        // Single Yellow Floor Spike with ample landing room
-                        grid[12][sc + 2] = '^';
                     }
 
-                    // Moving Spike Spiders (Levels 5..11)
-                    if (lvlNum >= 5 && section % 2 === 0) {
+                    // Populate Subterranean Dungeon Chamber (Rows 15..23)
+                    // Dungeon Platforms & Hidden Underground Rings
+                    for (let c = startC + 6; c <= endC - 6; c += 7) {
+                        const dPlatRow = 21 - ((c + z) % 3);
+                        grid[dPlatRow][c] = 'D';
+                        grid[dPlatRow][c + 1] = (lvlNum >= 4 && c % 2 === 0) ? 'B' : 'D';
+                        grid[dPlatRow][c + 2] = 'D';
+
+                        // Hidden Dungeon Golden Ring
+                        rings.push({ x: (c + 1.5) * TILE, y: (dPlatRow - 1.5) * TILE, collected: false });
+
+                        // Dungeon Floor Spikes (scales with level hardness)
+                        if (lvlNum >= 2 || c === midC) {
+                            grid[23][c + 3] = '^';
+                            if (lvlNum >= 6) grid[23][c + 4] = '^';
+                        }
+                    }
+
+                    // Underground Water Pool & Buoyancy Puzzle in Dungeon Zone 1 (Levels 3+)
+                    if (lvlNum >= 3 && z === 1) {
+                        grid[22][startC + 5] = 'L'; // Inflator inside dungeon
+                        for (let wc = startC + 7; wc <= midC + 2; wc++) {
+                            grid[22][wc] = 'W';
+                            grid[23][wc] = 'W';
+                        }
+                        grid[22][midC + 4] = 'S'; // Deflator after water pool
+                    }
+
+                    // Dungeon Checkpoint Diamond
+                    grid[22][midC] = 'C';
+
+                    // Dungeon Guardian Moving Spike Spiders (Speed & count increase every level!)
+                    const spiderCountInChamber = Math.min(3, Math.ceil(lvlNum / 3));
+                    for (let spIdx = 0; spIdx < spiderCountInChamber; spIdx++) {
+                        const spCol = startC + 8 + spIdx * Math.max(5, Math.floor((endC - startC - 14) / spiderCountInChamber));
+                        if (spCol < endC - 5) {
+                            movingSpiders.push({
+                                x: spCol * TILE,
+                                y: 18 * TILE,
+                                minY: 15.5 * TILE,
+                                maxY: 22.2 * TILE,
+                                vx: lvlNum >= 5 && spIdx % 2 === 1 ? (0.8 + lvlNum * 0.1) : 0,
+                                minX: (spCol - 3) * TILE,
+                                maxX: (spCol + 3) * TILE,
+                                vy: 1.15 + lvlNum * 0.16
+                            });
+                        }
+                    }
+
+                    // 3. Populate Surface World above this Zone (Rows 1..12)
+                    for (let c = startC + 4; c <= endC - 5; c += 8) {
+                        // Stepping stone
+                        grid[11][c - 2] = '#';
+                        grid[11][c - 1] = 'B';
+
+                        const sPlatRow = 9 - ((c + lvlNum) % 3); // Rows 9, 8, or 7
+                        for (let k = 0; k < 4; k++) {
+                            grid[sPlatRow][c + k] = (k === 2 && lvlNum >= 4) ? 'B' : '#';
+                        }
+                        rings.push({ x: (c + 2) * TILE, y: (sPlatRow - 1.4) * TILE, collected: false });
+
+                        // Surface Spike Obstacles (More spikes on higher levels)
+                        if (grid[13][c + 1] === '#') {
+                            grid[12][c + 1] = '^';
+                            if (lvlNum >= 5 && grid[13][c + 2] === '#') grid[12][c + 2] = '^';
+                        }
+                    }
+
+                    // Surface Patrol Spiders on Levels 2+
+                    if (lvlNum >= 2) {
                         movingSpiders.push({
-                            x: (sc + 6) * TILE,
-                            y: 9 * TILE,
-                            minY: 5 * TILE,
-                            maxY: 11.5 * TILE,
-                            vy: 1.2 + lvlNum * 0.08
+                            x: (midC + 2) * TILE,
+                            y: 7 * TILE,
+                            minY: 3.5 * TILE,
+                            maxY: 11.2 * TILE,
+                            vx: 0,
+                            minX: midC * TILE,
+                            maxX: midC * TILE,
+                            vy: 1.0 + lvlNum * 0.18
                         });
                     }
 
-                    // Jump Booster ('G') on high tower levels
-                    if (lvlNum >= 8 && section === 3) {
-                        grid[12][sc - 1] = 'G';
-                        for (let k = 0; k < 4; k++) grid[6][sc + k] = '#';
-                        rings.push({ x: (sc + 2) * TILE, y: 4.5 * TILE, collected: false });
-                    }
-
-                    // Mid-level Checkpoint Diamond
-                    if (section === Math.floor((mapCols - 12) / 24)) {
-                        grid[platRow - 1][sc + 1] = 'C';
+                    // Surface Checkpoint & Super Jump Booster on high levels
+                    grid[12][startC - 1] = 'C';
+                    if (lvlNum >= 4 && z === numDungeonZones - 1) {
+                        grid[12][endC + 1] = 'G';
                     }
                 }
 
-                // Final Ring & Level Exit Portal at the right end of the stage
+                // Opening Ring near Start & Final Ring before the Exit Gate
+                rings.unshift({ x: 9 * TILE, y: 11 * TILE, collected: false });
                 rings.push({ x: (mapCols - 9) * TILE, y: 11 * TILE, collected: false });
+
                 exitPortal = {
                     x: (mapCols - 5) * TILE,
                     y: 11 * TILE,
@@ -3642,11 +3690,9 @@ if (inputState.action) fireLaser();</pre>
 
                 totalRings = rings.length;
                 ringsCollected = 0;
-
-                // Spawn Ball at Left Start
                 checkpoint = { x: 4 * TILE, y: 11 * TILE, isBig: false };
                 respawnAtCheckpoint();
-                levelBannerTimer = 95;
+                levelBannerTimer = 105;
             }
 
             function respawnAtCheckpoint() {
@@ -3655,7 +3701,7 @@ if (inputState.action) fireLaser();</pre>
                 ball.vx = 0;
                 ball.vy = 0;
                 ball.isBig = checkpoint.isBig;
-                ball.r = ball.isBig ? 14 : 9.5;
+                ball.r = ball.isBig ? 13.5 : 9.5;
                 ball.jumpBoostTimer = 0;
                 ball.invulnTimer = 45;
             }
@@ -3676,7 +3722,7 @@ if (inputState.action) fireLaser();</pre>
             function isSolidTile(r, c) {
                 if (r < 0 || r >= mapRows || c < 0 || c >= mapCols) return true;
                 const t = grid[r][c];
-                return t === '#' || t === 'B';
+                return t === '#' || t === 'D' || t === 'B';
             }
 
             function isWaterTile(r, c) {
@@ -3693,7 +3739,7 @@ if (inputState.action) fireLaser();</pre>
                     return;
                 }
 
-                const spd = Math.max(0.55, appState.gameSpeed * 1.45);
+                const spd = 0.85;
                 if (levelBannerTimer > 0) levelBannerTimer -= spd;
                 if (ball.invulnTimer > 0) ball.invulnTimer -= spd;
                 if (ball.jumpBoostTimer > 0) ball.jumpBoostTimer -= spd;
@@ -3701,8 +3747,8 @@ if (inputState.action) fireLaser();</pre>
                 ball.r = ball.isBig ? 13.5 : 9.5;
 
                 // Horizontal Roll Control
-                const accel = 0.42 * spd;
-                const maxVx = 4.2;
+                const accel = 0.44 * spd;
+                const maxVx = 4.3;
                 if (inputState.left) ball.vx = Math.max(-maxVx, ball.vx - accel);
                 else if (inputState.right) ball.vx = Math.min(maxVx, ball.vx + accel);
                 else ball.vx *= 0.84;
@@ -3714,7 +3760,6 @@ if (inputState.action) fireLaser();</pre>
 
                 // Gravity vs Big Ball Water Buoyancy
                 if (inWater && ball.isBig) {
-                    // Big inflated ball floats upward in water!
                     ball.vy = Math.max(-3.8, ball.vy - 0.34 * spd);
                 } else if (inWater) {
                     ball.vy = Math.min(3.2, ball.vy + 0.14 * spd);
@@ -3722,10 +3767,10 @@ if (inputState.action) fireLaser();</pre>
                     ball.vy = Math.min(7.2, ball.vy + 0.25 * spd);
                 }
 
-                // Jump Input (Up / Space / FIRE button) — Generous jump height so platforms are easy to reach
+                // Jump Input (Up / Space / FIRE button)
                 const jumpDesired = inputState.up || inputState.action || inputState.justPressedAction;
                 if (jumpDesired && (ball.onGround || (inWater && ball.isBig))) {
-                    const jumpStrength = ball.jumpBoostTimer > 0 ? -9.6 : -8.2;
+                    const jumpStrength = ball.jumpBoostTimer > 0 ? -9.8 : -8.3;
                     ball.vy = jumpStrength;
                     ball.onGround = false;
                     inputState.justPressedAction = false;
@@ -3760,11 +3805,10 @@ if (inputState.action) fireLaser();</pre>
                     const hitRubber = grid[botRowV]?.[curLeftCol] === 'B' || grid[botRowV]?.[curRightCol] === 'B';
                     ball.y = botRowV * TILE - ball.r - 0.1;
                     if (hitRubber) {
-                        ball.vy = -7.8;
+                        ball.vy = -8.6;
                         playArcadeSound('bounce');
                         triggerGamepadVibration(35, 0.4, 0.5);
                     } else if (ball.vy > 2.4 && !jumpDesired) {
-                        // Signature Nokia Bounce elastic rebound
                         ball.vy = -ball.vy * 0.42;
                         ball.onGround = true;
                     } else {
@@ -3785,11 +3829,11 @@ if (inputState.action) fireLaser();</pre>
                     ball.isBig = true;
                     playArcadeSound('powerup');
                     triggerGamepadVibration(60, 0.5, 0.7);
-                    showToast('🎈 Ball Inflated! You can now float in deep water!', 'info');
-                } else if (tileAtBall === 'D' && ball.isBig) {
+                    showToast('🎈 Ball Inflated! Float up through flooded dungeon pools!', 'info');
+                } else if (tileAtBall === 'S' && ball.isBig) {
                     ball.isBig = false;
                     playArcadeSound('coin');
-                    showToast('📍 Ball Deflated! Squeeze through narrow 1-tile passages!', 'info');
+                    showToast('📍 Ball Deflated! Fit through tight dungeon passages!', 'info');
                 } else if (tileAtBall === 'G') {
                     ball.jumpBoostTimer = 420;
                     grid[centerRow][centerCol] = '.';
@@ -3800,10 +3844,10 @@ if (inputState.action) fireLaser();</pre>
                     checkpoint = { x: ball.x, y: ball.y, isBig: ball.isBig };
                     addScore(50);
                     playArcadeSound('powerup');
-                    showToast('💎 Checkpoint Saved!', 'success');
+                    showToast('💎 Dungeon Checkpoint Saved!', 'success');
                 }
 
-                // Collect Golden Rings
+                // Collect Golden Rings (Upper + Dungeon Rings)
                 rings.forEach(ring => {
                     if (!ring.collected && Math.hypot(ball.x - ring.x, ball.y - ring.y) < ball.r + 12) {
                         ring.collected = true;
@@ -3814,16 +3858,20 @@ if (inputState.action) fireLaser();</pre>
                         if (ringsCollected >= totalRings) {
                             exitPortal.open = true;
                             playArcadeSound('powerup');
-                            showToast('🚪 All Rings Collected! The Exit Portal is OPEN!', 'success');
+                            showToast('🚪 All Surface & Dungeon Rings Collected! Exit Gate OPEN!', 'success');
                         }
                     }
                 });
 
-                // Update Moving Spike Spiders
+                // Update Moving Spike Spiders (Vertical & Horizontal Dungeon Patrol)
                 for (let i = 0; i < movingSpiders.length; i++) {
                     const sp = movingSpiders[i];
                     sp.y += sp.vy * spd;
                     if (sp.y < sp.minY || sp.y > sp.maxY) sp.vy *= -1;
+                    if (sp.vx) {
+                        sp.x += sp.vx * spd;
+                        if (sp.x < sp.minX || sp.x > sp.maxX) sp.vx *= -1;
+                    }
                     if (Math.hypot(ball.x - sp.x, ball.y - sp.y) < ball.r + 10) {
                         loseLife();
                         if (isGameOver) return;
@@ -3832,47 +3880,64 @@ if (inputState.action) fireLaser();</pre>
 
                 // Check Level Exit Portal
                 if (exitPortal.open && Math.hypot(ball.x - exitPortal.x, ball.y - exitPortal.y) < ball.r + 16) {
-                    addScore(250 + level * 50);
+                    addScore(350 + level * 75);
                     playArcadeSound('powerup');
                     triggerGamepadVibration(180, 0.8, 1.0);
                     if (level < 11) {
                         level++;
                         saveGameProgress('nokia_bounce', level, currentScore);
-                        showToast(`🎉 LEVEL ${level - 1} COMPLETE! Advancing to Level ${level}/11!`, 'success');
+                        showToast(`🎉 LEVEL ${level - 1} CLEARED! Entering Harder Dungeon Level ${level}/11!`, 'success');
                         buildNokiaLevel(level);
                     } else {
                         saveGameProgress('nokia_bounce', 1, currentScore);
-                        triggerGameOver('ALL 11 NOKIA BOUNCE LEVELS COMPLETED!', '👑');
+                        triggerGameOver('ALL 11 NOKIA BOUNCE DUNGEON LEVELS COMPLETED!', '👑');
                         return;
                     }
                 }
 
-                // ==================== CAMERA & RENDER ====================
+                // ==================== 2D CAMERA (X & Y) FOR SURFACE + DUNGEON EXPLORATION ====================
                 const theme = BOUNCE_LEVEL_THEMES[(level - 1) % BOUNCE_LEVEL_THEMES.length];
                 const camX = Math.max(0, Math.min(mapCols * TILE - canvas.width, ball.x - canvas.width * 0.38));
+                const camY = Math.max(0, Math.min(mapRows * TILE - canvas.height, ball.y - canvas.height * 0.5));
+                const inDungeonDepth = ball.y >= 14 * TILE;
 
+                // Sky vs Underground Dungeon Backdrop
                 ctx.fillStyle = theme.sky;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.save();
-                ctx.translate(-camX, 0);
+                ctx.translate(-camX, -camY);
+
+                // Dark Subterranean Dungeon Backdrop (Rows 14..26)
+                ctx.fillStyle = theme.dungeonBg;
+                ctx.fillRect(camX, 14 * TILE, canvas.width, (mapRows - 14) * TILE);
+
+                // Subtle Dungeon Torch Glows
+                ctx.fillStyle = 'rgba(251, 191, 36, 0.08)';
+                for (let tc = 10; tc < mapCols; tc += 14) {
+                    ctx.beginPath();
+                    ctx.arc(tc * TILE, 18 * TILE, 58, 0, Math.PI * 2);
+                    ctx.fill();
+                }
 
                 const startCol = Math.max(0, Math.floor(camX / TILE) - 1);
                 const endCol = Math.min(mapCols - 1, Math.ceil((camX + canvas.width) / TILE) + 1);
+                const startRow = Math.max(0, Math.floor(camY / TILE) - 1);
+                const endRow = Math.min(mapRows - 1, Math.ceil((camY + canvas.height) / TILE) + 1);
 
-                for (let r = 0; r < mapRows; r++) {
+                for (let r = startRow; r <= endRow; r++) {
                     for (let c = startCol; c <= endCol; c++) {
                         const t = grid[r][c];
                         const tx = c * TILE;
                         const ty = r * TILE;
 
-                        if (t === '#') {
-                            ctx.fillStyle = theme.brick;
+                        if (t === '#' || t === 'D') {
+                            ctx.fillStyle = t === 'D' ? theme.dungeonBrick : theme.brick;
                             ctx.fillRect(tx, ty, TILE, TILE);
-                            ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+                            ctx.strokeStyle = 'rgba(0,0,0,0.45)';
                             ctx.lineWidth = 1;
                             ctx.strokeRect(tx, ty, TILE, TILE);
-                            ctx.fillStyle = 'rgba(255,255,255,0.22)';
+                            ctx.fillStyle = t === 'D' ? 'rgba(148,163,184,0.18)' : 'rgba(255,255,255,0.22)';
                             ctx.fillRect(tx + 2, ty + 2, TILE - 4, 4);
                         } else if (t === 'B') {
                             ctx.fillStyle = '#0284c7';
@@ -3881,7 +3946,7 @@ if (inputState.action) fireLaser();</pre>
                             ctx.lineWidth = 2;
                             ctx.strokeRect(tx + 1, ty + 1, TILE - 2, TILE - 2);
                         } else if (t === 'W') {
-                            ctx.fillStyle = 'rgba(37, 99, 235, 0.52)';
+                            ctx.fillStyle = 'rgba(37, 99, 235, 0.55)';
                             ctx.fillRect(tx, ty, TILE, TILE);
                         } else if (t === '^') {
                             ctx.fillStyle = '#facc15';
@@ -3894,7 +3959,7 @@ if (inputState.action) fireLaser();</pre>
                             ctx.closePath();
                             ctx.fill();
                             ctx.stroke();
-                        } else if (t === 'L' || t === 'D') {
+                        } else if (t === 'L' || t === 'S') {
                             ctx.fillStyle = t === 'L' ? '#22c55e' : '#f97316';
                             ctx.beginPath();
                             ctx.arc(tx + TILE / 2, ty + TILE / 2, 8, 0, Math.PI * 2);
@@ -3935,7 +4000,7 @@ if (inputState.action) fireLaser();</pre>
 
                 // Draw Moving Spike Spiders
                 movingSpiders.forEach(sp => {
-                    ctx.fillStyle = '#1e293b';
+                    ctx.fillStyle = '#0f172a';
                     ctx.beginPath();
                     ctx.arc(sp.x, sp.y, 10, 0, Math.PI * 2);
                     ctx.fill();
@@ -3973,36 +4038,46 @@ if (inputState.action) fireLaser();</pre>
 
                 ctx.restore();
 
-                // Top Nokia Bounce HUD Bar
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+                // Top Nokia Bounce HUD Bar (Shows Zone: SURFACE vs DUNGEON)
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
                 ctx.fillRect(6, 6, canvas.width - 12, 26);
-                ctx.font = 'bold 11px Orbitron, sans-serif';
+                ctx.font = 'bold 10px Orbitron, sans-serif';
                 ctx.fillStyle = '#f87171';
-                ctx.fillText(`LEVEL ${level}/11`, 14, 23);
+                ctx.fillText(`LVL ${level}/11`, 12, 23);
 
                 ctx.fillStyle = '#facc15';
-                ctx.fillText(`RINGS: ${ringsCollected}/${totalRings}`, 125, 23);
+                ctx.fillText(`RINGS: ${ringsCollected}/${totalRings}`, 92, 23);
 
                 ctx.fillStyle = '#ffffff';
-                ctx.fillText(`BALLS: ${'🔴'.repeat(Math.max(0, lives))}`, 255, 23);
+                ctx.fillText(`BALLS: ${'🔴'.repeat(Math.max(0, lives))}`, 205, 23);
 
-                ctx.fillStyle = exitPortal.open ? '#4ade80' : '#38bdf8';
-                ctx.fillText(exitPortal.open ? 'EXIT OPEN!' : (ball.isBig ? 'SIZE: BIG' : 'SIZE: NORMAL'), 395, 23);
+                ctx.fillStyle = exitPortal.open ? '#4ade80' : (inDungeonDepth ? '#c084fc' : '#38bdf8');
+                ctx.fillText(exitPortal.open ? 'EXIT OPEN!' : (inDungeonDepth ? '⚔️ DUNGEON' : '☀️ SURFACE'), 335, 23);
+
+                // Nearest Uncollected Ring Compass Arrow so players can find hidden Dungeon Rings
+                const nextRing = rings.find(r => !r.collected);
+                if (nextRing) {
+                    const dy = nextRing.y - ball.y;
+                    const dirHint = dy > 90 ? '⬇ RING IN DUNGEON' : dy < -90 ? '⬆ RING ABOVE' : '➡ RING AHEAD';
+                    ctx.fillStyle = '#fde047';
+                    ctx.font = 'bold 9px Orbitron, sans-serif';
+                    ctx.fillText(dirHint, 422, 23);
+                }
 
                 // Level Banner Overlay
                 if (levelBannerTimer > 0) {
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-                    ctx.fillRect(110, 145, 300, 66);
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+                    ctx.fillRect(95, 140, 330, 72);
                     ctx.strokeStyle = '#ef4444';
                     ctx.lineWidth = 2;
-                    ctx.strokeRect(110, 145, 300, 66);
+                    ctx.strokeRect(95, 140, 330, 72);
                     ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 16px Orbitron, sans-serif';
+                    ctx.font = 'bold 15px Orbitron, sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.fillText(`NOKIA BOUNCE — LEVEL ${level} / 11`, 260, 173);
+                    ctx.fillText(`LEVEL ${level} / 11 — ${theme.name.toUpperCase()}`, 260, 168);
                     ctx.fillStyle = '#fde047';
                     ctx.font = '11px Inter, sans-serif';
-                    ctx.fillText(theme.name + ' (Progress Auto-Saved)', 260, 195);
+                    ctx.fillText(`Explore Surface & Underground Dungeons (${totalRings} Rings)`, 260, 192);
                     ctx.textAlign = 'start';
                 }
 

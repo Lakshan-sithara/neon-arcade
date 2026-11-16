@@ -2,7 +2,7 @@
  * Cloudflare Pages Function to connect `index.html` to your Cloudflare D1 SQLite Database
  * Save this file in your GitHub repository at: functions/api/db.js
  *
- * Supports your exact Cloudflare D1 binding from your screenshot:
+ * Supports your exact Cloudflare D1 binding:
  * Binding Name: `neon-arcade-db` (also checks `DB` or `neon_arcade_db` automatically)
  */
 
@@ -17,8 +17,8 @@ const JSON_HEADERS = {
     'Access-Control-Allow-Headers': 'Content-Type'
 };
 
-// Server-side protected destination address (never exposed in client HTML/JS)
-const DEFAULT_FEEDBACK_RECIPIENT = 'duty-unnerve-dares@duck.com';
+// Server-side destination address for all player feedback
+const DEFAULT_FEEDBACK_RECIPIENT = 'lakshansitharaabeysinghe@gmail.com';
 
 // Automatically ensures all 6 SQLite tables (including online_presence & user_feedback) exist in D1
 async function ensureSchema(db) {
@@ -78,7 +78,7 @@ async function ensureSchema(db) {
     ]);
 }
 
-// Dispatches secure server-side email notification to duty-unnerve-dares@duck.com
+// Dispatches server-side email notification to lakshansitharaabeysinghe@gmail.com
 // Supports Resend API (env.RESEND_API_KEY), FormSubmit Server Relay, or MailChannels Worker Relay
 async function sendSecureFeedbackEmail(env, fb) {
     const targetEmail = (env && env.FEEDBACK_TO_EMAIL) ? env.FEEDBACK_TO_EMAIL : DEFAULT_FEEDBACK_RECIPIENT;
@@ -87,7 +87,7 @@ async function sendSecureFeedbackEmail(env, fb) {
         `New Player Feedback Received on NeonArcade`,
         `------------------------------------------`,
         `Player / GamerTag: ${fb.name}`,
-        `Reply Email: ${fb.email || 'Not provided'}`,
+        `Account Email: ${fb.email || 'Not provided'}`,
         `Category: ${fb.category}`,
         `Rating: ${fb.rating} / 5 Stars`,
         `Device: ${fb.device || 'Web Browser'}`,
@@ -118,7 +118,7 @@ async function sendSecureFeedbackEmail(env, fb) {
         } catch (e) {}
     }
 
-    // Method 2: Zero-Config Encrypted HTTPS Relay via FormSubmit AJAX API + MailChannels fallback
+    // Method 2: Encrypted HTTPS Relay via FormSubmit AJAX API
     try {
         await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(targetEmail)}`, {
             method: 'POST',
@@ -130,11 +130,12 @@ async function sendSecureFeedbackEmail(env, fb) {
             },
             body: JSON.stringify({
                 _subject: subject,
-                name: fb.name,
-                email: fb.email || 'noreply@neonarcade.io',
-                category: fb.category,
-                rating: `${fb.rating}/5`,
-                message: fb.message,
+                Player_GamerTag: fb.name,
+                Account_Email: fb.email || 'noreply@neonarcade.io',
+                Category: fb.category,
+                Star_Rating: `${fb.rating}/5`,
+                Device: fb.device || 'Web Browser',
+                Message: fb.message,
                 _captcha: 'false',
                 _template: 'table'
             })
@@ -188,6 +189,7 @@ export async function onRequestGet(context) {
                  ON CONFLICT(session_id) DO UPDATE SET username = excluded.username, last_seen = excluded.last_seen`
             ).bind(sid, uname, nowEpochSec).run();
         }
+
         // Prune stale sessions older than 45 seconds
         await db.prepare(`DELETE FROM online_presence WHERE last_seen < ?1`).bind(nowEpochSec - 45).run();
 
@@ -345,7 +347,7 @@ export async function onRequestPost(context) {
                 payload.createdAt || new Date().toISOString()
             ).run();
 
-            // Securely dispatch email to duty-unnerve-dares@duck.com from the server
+            // Securely dispatch email to lakshansitharaabeysinghe@gmail.com from the server
             await sendSecureFeedbackEmail(context.env, {
                 name: cleanName,
                 email: cleanEmail,

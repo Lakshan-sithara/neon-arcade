@@ -5,7 +5,7 @@
  * open and play all built-in games even with zero internet connection.
  */
 
-const CACHE_NAME = 'neon-arcade-offline-v3.9';
+const CACHE_NAME = 'neon-arcade-offline-v4.0';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
